@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GameLogic
 {
@@ -31,7 +29,7 @@ namespace GameLogic
         King = 12
     }
 
-    public class Card
+    public class Card : ICard
     {
         public readonly CardSuit Suit;
         public readonly CardRank Rank;
@@ -106,15 +104,29 @@ namespace GameLogic
         {
             return !(card1 < card2);
         }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null)
+                return 1;
+            var otherCard = obj as Card;
+            if (otherCard == null)
+                throw new ArgumentException("Object in not a Card");
+            var compRes = 0;
+            if (this.Rank < otherCard.Rank)
+                compRes = -1;
+            else if (this.Rank > otherCard.Rank)
+                compRes = 1;
+            return compRes;
+        }
     }
 
-    public class CardDeck
+    public class CardDeck : ICardDeck
     {
         private readonly Card[] cards = new Card[52];
         public bool InGame { get; private set; }
         public CardDeck()
         {
-            // TODO:
             FillDeck();
             InGame = false;
         }
@@ -152,9 +164,7 @@ namespace GameLogic
             {
                 cards[(s - 1) * 13] = new Card((CardSuit)s, CardRank.Ace);
                 for (int r = 1; r < 13; r++)
-                {
                     cards[(s - 1) * 13 + r] = new Card((CardSuit)s, (CardRank)r);
-                }
             }
         }
 
