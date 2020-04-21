@@ -39,6 +39,7 @@ namespace GameLogic
     }
 
     public enum CardCombination {
+        None,
         HighCard,
         Pair,
         TwoPair,
@@ -47,8 +48,8 @@ namespace GameLogic
         Flush,
         FullHouse,
         FourOfAKind,
-        StraightFlush,
-        TheRoyalFlash
+        StraightFlash,
+        RoyalFlash
     }
     class Poker
     {

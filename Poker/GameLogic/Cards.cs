@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
+
 namespace GameLogic
 {
     public enum CardSuit
@@ -195,12 +198,87 @@ namespace GameLogic
     public class Combination : ICombination {
         private readonly List<Card> cards;
         public CardCombination combination { get; private set; }
-        public Combination(List<Card> cards) {
-            this.cards = cards;
+        public Combination(List<Card> cards)
+        {
+            this.cards = cards.OrderBy(x => x.Rank).ToList();
         }
 
-        private CardCombination DetermineCardCombination(List<Card> cards) {
-            throw new NotImplementedException();
+        // need tests
+        private CardCombination DetermineCardCombination(List<Card> cards)
+        {
+            var suits = new Dictionary<CardSuit, Tuple<int, List<Card>>>();
+            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
+            cards.GroupBy(x => x.Suit).SelectMany(x => { suits[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
+            var possibleCombinations = new HashSet<int>(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 });
+            var suitCount = suits.Count;
+            var rankCount = ranks.Count;
+
+            if (suitCount == 1)
+            {
+                // S, SF, RF
+                if (IsStraight(cards))
+                {
+                    if (cards[0].Rank == CardRank.Ten)
+                        return CardCombination.RoyalFlash;
+                    return CardCombination.StraightFlash;
+                }
+
+            }
+
+            if (rankCount == 2)
+            {
+                // FH, FOAK
+                foreach (var r in ranks.Keys)
+                {
+                    if (ranks[r].Item2.Count == 3)
+                        return CardCombination.FullHouse;
+                }
+                return CardCombination.FourOfAKind;
+            }
+
+            if (rankCount == 3)
+            {
+                // TP, TOAK
+                foreach (var r in ranks.Keys)
+                {
+                    if (ranks[r].Item2.Count == 3)
+                        return CardCombination.ThreeOfAKind;
+                }
+                return CardCombination.TwoPair;
+            }
+
+            if (rankCount == 4)
+            {
+                // P
+                return CardCombination.Pair;
+            }
+
+            if (rankCount == 5)
+            {
+                // HK (others have been checked)
+                return CardCombination.HighCard;
+            }
+
+            return CardCombination.None;
+        }
+
+        public static bool IsStraight(List<Card> cards)
+        {
+            var count = cards.Count;
+            if (cards[0].Rank == CardRank.Two && cards[cards.Count - 1].Rank == CardRank.Ace)
+            {
+                count -= 1;
+            }
+
+            for (int i = 0; i < count - 1; i++)
+            {
+                if (cards[i].Rank != cards[i + 1].Rank - 1)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public int CompareTo(object obj) {
