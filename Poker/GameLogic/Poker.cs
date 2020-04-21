@@ -37,6 +37,19 @@ namespace GameLogic
         Waiting,
         InGame
     }
+
+    public enum CardCombination {
+        HighCard,
+        Pair,
+        TwoPair,
+        ThreeOfAKind,
+        Straight,
+        Flush,
+        FullHouse,
+        FourOfAKind,
+        StraightFlush,
+        TheRoyalFlash
+    }
     class Poker
     {
     }

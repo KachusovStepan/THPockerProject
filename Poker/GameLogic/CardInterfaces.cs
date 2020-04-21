@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace GameLogic
 {
@@ -15,5 +16,9 @@ namespace GameLogic
         void Shuffle();
         void FillDeck();
         void SetReady();
+    }
+
+    public interface ICombination : IComparable {
+        //CardCombination DetermineCardCombination(List<Card> card);
     }
 }

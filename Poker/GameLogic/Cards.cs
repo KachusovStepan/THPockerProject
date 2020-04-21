@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 namespace GameLogic
 {
     public enum CardSuit
@@ -189,6 +189,22 @@ namespace GameLogic
             }
 
             this.cards = cards;
+        }
+    }
+
+    public class Combination : ICombination {
+        private readonly List<Card> cards;
+        public CardCombination combination { get; private set; }
+        public Combination(List<Card> cards) {
+            this.cards = cards;
+        }
+
+        private CardCombination DetermineCardCombination(List<Card> cards) {
+            throw new NotImplementedException();
+        }
+
+        public int CompareTo(object obj) {
+            throw new NotImplementedException();
         }
     }
 }
