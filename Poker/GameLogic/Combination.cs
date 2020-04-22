@@ -31,17 +31,17 @@ namespace GameLogic
         }
     }
 
-    static class CombinationHelper
+    public static class CombinationHelper
     {
         public static List<(CardCombination Comb, Func<List<Card>, bool> Check)> GetAllCombinationsChecks()
         {
             return new List<(CardCombination, Func<List<Card>, bool>)>
             {
                 ( CardCombination.RoyalFlash, IsRoyalFlash ),
-                ( CardCombination.StraightFlush, IsStraightFlush ),
+                ( CardCombination.StraightFlush, IsStraightFlash ),
                 ( CardCombination.FullHouse, IsFullHouse ),
                 ( CardCombination.Straight, IsStraight ),
-                ( CardCombination.Flush, IsFlush ),
+                ( CardCombination.Flush, IsFlash ),
                 ( CardCombination.ThreeOfAKind, IsThreeOfAKind ),
                 ( CardCombination.TwoPair, IsTwoPair ),
                 ( CardCombination.Pair, IsPair )
@@ -81,7 +81,7 @@ namespace GameLogic
                 .Equals(4);
         }
 
-        public static bool IsFlush(List<Card> cards)
+        public static bool IsFlash(List<Card> cards)
         {
             return cards
                 .GroupBy(card => card.Suit)
@@ -92,7 +92,7 @@ namespace GameLogic
 
         public static bool IsFourOfAKind(List<Card> cards) => IsQuadsOrSetOrPair(cards, 4);
 
-        public static bool IsStraightFlush(List<Card> cards)
+        public static bool IsStraightFlash(List<Card> cards)
         {
             foreach (var group in cards.GroupBy(card => card.Suit).Where(g => g.Count() >= 5))
             {

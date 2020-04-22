@@ -1,0 +1,7 @@
+C:\repos\THPokerProject\Poker\GameLogic\bin\Debug\GameLogic.exe.config
+C:\repos\THPokerProject\Poker\GameLogic\bin\Debug\GameLogic.exe
+C:\repos\THPokerProject\Poker\GameLogic\bin\Debug\GameLogic.pdb
+C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.csprojAssemblyReference.cache
+C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.csproj.CoreCompileInputs.cache
+C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.exe
+C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.pdb
