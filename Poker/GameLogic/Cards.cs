@@ -221,7 +221,7 @@ namespace GameLogic
                 {
                     if (cards[0].Rank == CardRank.Ten)
                         return CardCombination.RoyalFlash;
-                    return CardCombination.StraightFlash;
+                    return CardCombination.StraightFlush;
                 }
 
             }

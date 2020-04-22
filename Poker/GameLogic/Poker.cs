@@ -45,10 +45,10 @@ namespace GameLogic
         TwoPair,
         ThreeOfAKind,
         Straight,
-        Flash,
+        Flush,
         FullHouse,
         FourOfAKind,
-        StraightFlash,
+        StraightFlush,
         RoyalFlash
     }
     class Poker
