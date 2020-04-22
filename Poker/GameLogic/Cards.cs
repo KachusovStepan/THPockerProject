@@ -204,6 +204,7 @@ namespace GameLogic
         }
 
         // need tests
+        // use delegates in collection to determine combinations
         private CardCombination DetermineCardCombination(List<Card> cards)
         {
             var suits = new Dictionary<CardSuit, Tuple<int, List<Card>>>();

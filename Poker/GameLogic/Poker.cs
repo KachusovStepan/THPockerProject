@@ -26,7 +26,7 @@ namespace GameLogic
         NotStart,
         PreFlop,
         Flop,
-        Tern,
+        Tern, // Turn
         River,
         ShowTime
     }
@@ -45,7 +45,7 @@ namespace GameLogic
         TwoPair,
         ThreeOfAKind,
         Straight,
-        Flush,
+        Flash,
         FullHouse,
         FourOfAKind,
         StraightFlash,
