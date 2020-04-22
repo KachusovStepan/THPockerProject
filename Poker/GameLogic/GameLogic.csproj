@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="CardInterfaces.cs" />
     <Compile Include="Cards.cs" />
+    <Compile Include="Combination.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Poker.cs" />

@@ -39,7 +39,6 @@ namespace GameLogic
     }
 
     public enum CardCombination {
-        None,
         HighCard,
         Pair,
         TwoPair,

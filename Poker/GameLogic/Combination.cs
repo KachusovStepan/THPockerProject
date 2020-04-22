@@ -17,7 +17,7 @@ namespace GameLogic
 
         // need tests
         // use delegates in collection to determine combinations
-        private CardCombination DetermineCardCombination(List<Card> cards)
+        private CardCombination DetermineCardCombination(List<Card> cards)  
         {
             return CombinationHelper.GetAllCombinationsChecks()
                 .Where(combinationCheck => combinationCheck.Check(cards))
@@ -101,6 +101,7 @@ namespace GameLogic
             }
             return false;
         }
+
 
         public static bool IsRoyalFlash(List<Card> cards)
         {
