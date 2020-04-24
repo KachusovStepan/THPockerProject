@@ -13,10 +13,11 @@ namespace Server
             if (address[address.Length - 1] == '/')
                 address = address.Substring(0, address.Length - 1);
             var uri = new Uri(string.Format("{0}/Service", address));
-            var serviceType = typeof(IContract);
+            var serviceType = typeof(SimpleService);
+            var contractType = typeof(IContract);
             var serviceHost = new ServiceHost(serviceType, uri);
             var binding = new BasicHttpBinding();
-            serviceHost.AddServiceEndpoint(serviceType, binding, address);
+            serviceHost.AddServiceEndpoint(contractType, binding, address);
             serviceHost.Open();
             Console.WriteLine("Press any key to finish");
             Console.ReadKey();
