@@ -57,6 +57,8 @@ namespace Server
         public static int CurrentPlayer;
         public static int CurrentBank;
         public static List<Card> TableCards = new List<Card>();
+        public static CardDeck Deck = new CardDeck();
+
         public static bool GetName(int id, out string name)
         {
             name = string.Empty;
@@ -64,8 +66,6 @@ namespace Server
                 name = PlayerByID[id].Name;
             return true;
         }
-
-        // Колода
 
         public static void Start()
         {
@@ -118,7 +118,14 @@ namespace Server
         private static void PreFlop()
         {
             // Тасовка колоды
+            Deck.Shuffle();
+
             // Выдача 2 карт каждому
+            for (int i = 0; i < 10; i++) {
+                if (Ready[i]) {
+                    PlayerBySeat[i].Hand = Tuple.Create(Deck.GetCard(), Deck.GetCard());
+                }
+            }
 
             // Круг торгов
             BettingRound();
@@ -128,6 +135,9 @@ namespace Server
         private static void Flop()
         {
             // На столе 3 карты
+            TableCards.Add(Deck.GetCard());
+            TableCards.Add(Deck.GetCard());
+            TableCards.Add(Deck.GetCard());
 
             // Круг торгов
             BettingRound();
@@ -136,7 +146,8 @@ namespace Server
 
         private static void Turn()
         {
-            // На столе 1 карты
+            // На стол добавляется 1 карты
+            TableCards.Add(Deck.GetCard());
 
             // Круг торгов
             BettingRound();
@@ -145,7 +156,9 @@ namespace Server
 
         private static void River()
         {
-            // На столе 1 карты
+            // На стол добавляется 1 карты
+            TableCards.Add(Deck.GetCard());
+
             // Круг торгов
             BettingRound();
             CollectMoney();
@@ -156,7 +169,7 @@ namespace Server
             // Вскрытие карт всеми оставшимися
             // Определить игрока с самой старшей комбинацией
             // Прибавить в банк победившего игрока банк игры
-
+            // RewardWinner(int seat)
         }
         private static void BettingRound()
         {

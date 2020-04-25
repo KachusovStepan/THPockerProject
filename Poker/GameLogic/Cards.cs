@@ -128,10 +128,12 @@ namespace GameLogic
     {
         private readonly Card[] cards = new Card[52];
         public bool InGame { get; private set; }
+        private int pointer;
         public CardDeck()
         {
             FillDeck();
             InGame = false;
+            pointer = 0;
         }
 
         public void Shuffle()
@@ -177,6 +179,12 @@ namespace GameLogic
             {
                 Console.WriteLine(card);
             }
+        }
+
+        public Card GetCard() {
+            var card = cards[pointer];
+            pointer++;
+            return card;
         }
     }
 
