@@ -298,14 +298,19 @@ namespace Server
             // Если дошло до BB и он сделал Bet or Raise, то еще один круг
             // Если был второй круг 
             var curr = Next((BB + 1) % 10);
+            var loopPointer = curr;
             while (Count > 1)
             {
                 BetHasBeenMade = false;
                 CurrentPlayer = curr;
                 WaitForBet();
                 Execute(RoundHistory[RoundHistory.Count - 1]);
+                if (!Ready[loopPointer])
+                    loopPointer = Next((loopPointer + 1) % 10);
 
-                if (curr == Next((curr + 1) % 10) && PlayerBySeat[BB].TableBet == PlayerBySeat[curr].TableBet)
+                // Странно, нужно протестировать
+                // Нужно определить когда закончить раунд
+                if (loopPointer == Next((curr + 1) % 10) && PlayerBySeat[loopPointer].TableBet == PlayerBySeat[curr].TableBet)
                     break;
 
                 curr = Next((curr + 1) % 10);
