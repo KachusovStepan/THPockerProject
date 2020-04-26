@@ -34,6 +34,56 @@ namespace GameLogic
 
     public class Card : ICard
     {
+        static Dictionary<char, CardSuit> charSuits = new Dictionary<char, CardSuit>
+        {
+            { 'h', CardSuit.Hearts },
+            { 'c', CardSuit.Clubs },
+            { 's', CardSuit.Spades },
+            { 'd', CardSuit.Diamonds }
+        };
+
+        static Dictionary<char, CardRank> charRanks = new Dictionary<char, CardRank>
+        {
+            { '2', CardRank.Two },
+            { '3', CardRank.Three },
+            { '4', CardRank.Four },
+            { '5', CardRank.Five },
+            { '6', CardRank.Six },
+            { '7', CardRank.Seven },
+            { '8', CardRank.Eight },
+            { '9', CardRank.Nine },
+            { '0', CardRank.Ten },
+            { 'j', CardRank.Jack },
+            { 'q', CardRank.Queen },
+            { 'k', CardRank.King },
+            { 'a', CardRank.Ace },
+        };
+
+        static Dictionary<CardSuit, char> suitChar = new Dictionary<CardSuit, char>
+        {
+            { CardSuit.Hearts, 'h' },
+            { CardSuit.Clubs, 'c' },
+            { CardSuit.Spades, 's'},
+            { CardSuit.Diamonds, 'd' }
+        };
+
+        static Dictionary<CardRank, char> rankChar = new Dictionary<CardRank, char>
+        {
+            { CardRank.Two, '2' },
+            { CardRank.Three, '3' },
+            { CardRank.Four, '4' },
+            { CardRank.Five, '5' },
+            { CardRank.Six, '6' },
+            { CardRank.Seven, '7' },
+            { CardRank.Eight, '8' },
+            { CardRank.Nine, '9' },
+            { CardRank.Ten, '0' },
+            { CardRank.Jack, 'j' },
+            { CardRank.Queen, 'q' },
+            { CardRank.King, 'k' },
+            { CardRank.Ace, 'a'},
+        };
+
         public readonly CardSuit Suit;
         public readonly CardRank Rank;
         public bool IsOpen { get; private set; }
@@ -76,6 +126,12 @@ namespace GameLogic
         public override string ToString()
         {
             return string.Format("({0} {1} {2})", Suit, Rank, IsOpen ? "Opened" : "Closed");
+        }
+
+        public string GetSimpleRepresentation()
+        {
+            var repr = string.Format("{0}{1}", suitChar[Suit], rankChar[Rank]);
+            return repr;
         }
 
         public static bool operator ==(Card card1, Card card2)

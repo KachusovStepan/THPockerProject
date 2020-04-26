@@ -26,7 +26,7 @@ namespace GameLogic
         NotStart,
         PreFlop,
         Flop,
-        Tern, // Turn
+        Turn, // Turn
         River,
         ShowTime
     }

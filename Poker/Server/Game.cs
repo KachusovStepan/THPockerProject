@@ -13,6 +13,16 @@ namespace Server
         public int Value;
         public int Seat;
         public int Id;
+
+        public BetNode(int playerId, int playerSeat, Bet playerBet, int value)
+        {
+            Id = playerId;
+            Seat = playerSeat;
+            PlayerBet = playerBet;
+            Value = value;
+        }
+
+        public BetNode(int playerId, int playerSeat, Bet playerBet) : this(playerId, playerSeat, playerBet, 0) { }
     }
 
     public class PlayerInfo
@@ -43,6 +53,14 @@ namespace Server
 
     public class Game
     {
+        private static Dictionary<GameState, char> turnChar = new Dictionary<GameState, char>() {
+            { GameState.PreFlop, 'p' },
+            { GameState.Flop, 'f' },
+            { GameState.Turn, 't' },
+            { GameState.River, 'r' },
+            { GameState.ShowTime, 's' }
+        };
+
         public readonly int GameId;
         public static int[] IDS;
         public List<BetNode> RoundHistory;
@@ -59,6 +77,7 @@ namespace Server
         public int CurrentBank;
         public List<Card> TableCards;
         public static CardDeck Deck;
+        private List<string> chat;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
 
@@ -92,6 +111,80 @@ namespace Server
             if (PlayerByID.ContainsKey(id))
                 name = PlayerByID[id].Name;
             return true;
+        }
+
+        public static Dictionary<int, int> ShowGames()
+        {
+            var res = new Dictionary<int, int>();
+            foreach (var gameId in GameInstances.Keys)
+            {
+                res.Add(gameId, GameInstances[gameId].PlayerBySeat.Count);
+            }
+
+            return res;
+        }
+
+        public static bool CreateNewGame(int gameId)
+        {
+            if (!GameInstances.ContainsKey(gameId))
+            {
+                GetGameInstance(gameId);
+                return true;
+            }
+            return false;
+        }
+
+        public int AddPlayer(string name, int position)
+        {
+            if (PlayerBySeat.ContainsKey(position))
+                return -1;
+            var player = new PlayerInfo(name, position);
+            var id = IDS.Where(x => !PlayerByID.ContainsKey(x)).FirstOrDefault();
+            PlayerByID.Add(id, player);
+            PlayerBySeat.Add(position, player);
+            return id;
+        }
+
+        public bool RemovePlayer(int playerId)
+        {
+            if (!PlayerByID.ContainsKey(playerId))
+            {
+                return false;
+            }
+            var playerInfo = PlayerByID[playerId];
+            var seat = playerInfo.Position;
+            PlayerBySeat.Remove(seat);
+            PlayerByID.Remove(playerId);
+            if (Ready[seat])
+            {
+                Ready[seat] = false;
+                Count--;
+            }
+            return true;
+        }
+
+        public bool AddMessage(int playerId, string playerMessage)
+        {
+            if (PlayerByID.ContainsKey(playerId))
+                return false;
+            var playerInfo = PlayerByID[playerId];
+            var message = String.Format("[{0}]: {1}", playerInfo.Name, playerMessage);
+            chat.Add(message);
+            return true;
+        }
+
+        public State GetGameState()
+        {
+            var banks = new Dictionary<int, int>();
+            var seatNames = new Dictionary<int, string>();
+            foreach (var seat in PlayerBySeat.Keys)
+            {
+                banks.Add(seat, PlayerBySeat[seat].ChipBank);
+                seatNames.Add(seat, PlayerBySeat[seat].Name);
+            }
+            var blindSeats = new Dictionary<char, int> { { 'd', D }, { 's', SB }, { 'b', BB } };
+            var state = new State(PlayerByID.Count, banks, CurrentBank, seatNames, blindSeats, turnChar[CurrentState], CurrentPlayer);
+            return state;
         }
 
         public void Start()
@@ -259,17 +352,6 @@ namespace Server
             BB = Next((SB + 1) % 10);
         }
 
-        public int AddPlayer(string name, int position)
-        {
-            if (PlayerBySeat.ContainsKey(position))
-                return -1;
-            var player = new PlayerInfo(name, position);
-            var id = IDS.Where(x => !PlayerByID.ContainsKey(x)).FirstOrDefault();
-            PlayerByID.Add(id, player);
-            PlayerBySeat.Add(position, player);
-            return id;
-        }
-
         // Плохое ожидание
         private void WaitForBet()
         {
@@ -280,27 +362,31 @@ namespace Server
             }
         }
 
-        public void Execute(BetNode bet)
+        public void Execute(BetNode betNode)
         {
-            var player = PlayerBySeat[bet.Seat];
-            if (bet.PlayerBet == Bet.Bet)
+            var player = PlayerBySeat[betNode.Seat];
+            if (betNode.PlayerBet == Bet.Bet)
             {
-                player.TableBet += bet.Value;
-                player.ChipBank -= bet.Value;
+                player.TableBet += betNode.Value;
+                player.ChipBank -= betNode.Value;
             }
-            else if (bet.PlayerBet == Bet.Call)
+            else if (betNode.PlayerBet == Bet.Call)
             {
-                player.TableBet += RoundHistory[RoundHistory.Count - 2].Value;
+                var bet = RoundHistory[RoundHistory.Count - 2].Value;
+                betNode.Value = bet;
+                player.TableBet += bet;
                 player.ChipBank -= RoundHistory[RoundHistory.Count - 2].Value;
             }
-            else if (bet.PlayerBet == Bet.Fold)
+            else if (betNode.PlayerBet == Bet.Fold)
             {
                 Count--;
-                Ready[bet.Seat] = false;
+                Ready[betNode.Seat] = false;
             }
-            else if (bet.PlayerBet == Bet.Raise)
+            else if (betNode.PlayerBet == Bet.Raise)
             {
-                player.TableBet += RoundHistory[RoundHistory.Count - 2].Value * 2;
+                var bet = RoundHistory[RoundHistory.Count - 2].Value * 2;
+                betNode.Value = bet;
+                player.TableBet += bet;
                 player.ChipBank -= RoundHistory[RoundHistory.Count - 2].Value * 2;
             }
         }
