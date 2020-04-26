@@ -41,25 +41,52 @@ namespace Server
         }
     }
 
-    public static class Game
+    public class Game
     {
-        public static int[] IDS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        public static List<BetNode> RoundHistory = new List<BetNode>();
-        public static Dictionary<int, PlayerInfo> PlayerBySeat = new Dictionary<int, PlayerInfo>();
-        public static Dictionary<int, PlayerInfo> PlayerByID = new Dictionary<int, PlayerInfo>();
-        public static GameState CurrentState;
-        public static int Count = 0;
-        public static bool[] Ready = new bool[10];
-        public static int SB = 0;
-        public static int BB = 0;
-        public static int D = 0;
-        public static bool BetHasBeenMade = false;
-        public static int CurrentPlayer;
-        public static int CurrentBank;
-        public static List<Card> TableCards = new List<Card>();
-        public static CardDeck Deck = new CardDeck();
+        public readonly int GameId;
+        public static int[] IDS;
+        public List<BetNode> RoundHistory;
+        public Dictionary<int, PlayerInfo> PlayerBySeat;
+        public Dictionary<int, PlayerInfo> PlayerByID;
+        public GameState CurrentState;
+        public int Count = 0;
+        public bool[] Ready;
+        public int SB = 0;
+        public int BB = 0;
+        public int D = 0;
+        public bool BetHasBeenMade;
+        public int CurrentPlayer;
+        public int CurrentBank;
+        public List<Card> TableCards;
+        public static CardDeck Deck;
 
-        public static bool GetName(int id, out string name)
+        private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
+
+        // Multiton
+        private Game(int gameId)
+        {
+            GameId = gameId;
+            IDS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            RoundHistory = new List<BetNode>();
+            PlayerBySeat = new Dictionary<int, PlayerInfo>();
+            PlayerByID = new Dictionary<int, PlayerInfo>();
+            Ready = new bool[10];
+            TableCards = new List<Card>();
+            Deck = new CardDeck();
+        }
+        public static Game GetGameInstance(int gameId)
+        {
+            if (!GameInstances.ContainsKey(gameId))
+            {
+                var newGame = new Game(gameId);
+                Game.GameInstances.Add(gameId, newGame);
+            }
+
+            return GameInstances[gameId];
+        }
+        
+
+        public bool GetName(int id, out string name)
         {
             name = string.Empty;
             if (PlayerByID.ContainsKey(id))
@@ -67,7 +94,7 @@ namespace Server
             return true;
         }
 
-        public static void Start()
+        public void Start()
         {
             for (int i = 0; i < 10; i++)
             {
@@ -115,7 +142,7 @@ namespace Server
                 ShowDown();
             }
         }
-        private static void PreFlop()
+        private void PreFlop()
         {
             // Тасовка колоды
             Deck.Shuffle();
@@ -132,7 +159,7 @@ namespace Server
             CollectMoney();
         }
 
-        private static void Flop()
+        private void Flop()
         {
             // На столе 3 карты
             TableCards.Add(Deck.GetCard());
@@ -144,7 +171,7 @@ namespace Server
             CollectMoney();
         }
 
-        private static void Turn()
+        private void Turn()
         {
             // На стол добавляется 1 карты
             TableCards.Add(Deck.GetCard());
@@ -154,7 +181,7 @@ namespace Server
             CollectMoney();
         }
 
-        private static void River()
+        private void River()
         {
             // На стол добавляется 1 карты
             TableCards.Add(Deck.GetCard());
@@ -164,14 +191,14 @@ namespace Server
             CollectMoney();
         }
 
-        private static void ShowDown()
+        private void ShowDown()
         {
             // Вскрытие карт всеми оставшимися
             // Определить игрока с самой старшей комбинацией
             // Прибавить в банк победившего игрока банк игры
             // RewardWinner(int seat)
         }
-        private static void BettingRound()
+        private void BettingRound()
         {
             // Начиная с игрока слева от BB
             // Текущий игрок делает ставку
@@ -205,14 +232,14 @@ namespace Server
             }
         }
 
-        public static void SetInitialRoles()
+        public void SetInitialRoles()
         {
             D = Next(0);
             SB = Next((D + 1) % 10);
             BB = Next((SB + 1) % 10);
         }
 
-        public static int Next(int start)
+        public int Next(int start)
         {
             var i = start;
             while (!Ready[i])
@@ -222,7 +249,7 @@ namespace Server
             return i;
         }
 
-        public static void Update()
+        public void Update()
         {
             Count = Ready.Where(x => x).Count();
             if (Count == 1)
@@ -232,7 +259,7 @@ namespace Server
             BB = Next((SB + 1) % 10);
         }
 
-        public static int AddPlayer(string name, int position)
+        public int AddPlayer(string name, int position)
         {
             if (PlayerBySeat.ContainsKey(position))
                 return -1;
@@ -244,7 +271,7 @@ namespace Server
         }
 
         // Плохое ожидание
-        private static void WaitForBet()
+        private void WaitForBet()
         {
             // Ожидать сообщения игроком ставки
             while (!BetHasBeenMade)
@@ -253,7 +280,7 @@ namespace Server
             }
         }
 
-        public static void Execute(BetNode bet)
+        public void Execute(BetNode bet)
         {
             var player = PlayerBySeat[bet.Seat];
             if (bet.PlayerBet == Bet.Bet)
@@ -278,7 +305,7 @@ namespace Server
             }
         }
 
-        public static void CollectMoney()
+        public void CollectMoney()
         {
             foreach (var seat in PlayerBySeat.Keys)
             {
@@ -287,7 +314,7 @@ namespace Server
             }
         }
 
-        public static void RewardWinner(int seat)
+        public void RewardWinner(int seat)
         {
             PlayerBySeat[seat].ChipBank += CurrentBank;
             CurrentBank = 0;
