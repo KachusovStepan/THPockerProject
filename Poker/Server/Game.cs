@@ -61,6 +61,7 @@ namespace Server
             { GameState.ShowTime, 's' }
         };
 
+        private int MinBet;
         public readonly int GameId;
         public static int[] IDS;
         public List<BetNode> RoundHistory;
@@ -78,6 +79,7 @@ namespace Server
         public List<Card> TableCards;
         public static CardDeck Deck;
         private List<string> chat;
+        private int roundMaxBet;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
 
@@ -117,9 +119,7 @@ namespace Server
         {
             var res = new Dictionary<int, int>();
             foreach (var gameId in GameInstances.Keys)
-            {
                 res.Add(gameId, GameInstances[gameId].PlayerBySeat.Count);
-            }
 
             return res;
         }
@@ -199,6 +199,7 @@ namespace Server
 
             while (true)
             {
+                TableCards.Clear();
                 for (int i = 0; i < 10; i++)
                 {
                     Ready[i] = PlayerBySeat.ContainsKey(i);
@@ -239,7 +240,7 @@ namespace Server
         {
             // Тасовка колоды
             Deck.Shuffle();
-
+            // TODO  Сделать слепые ставки
             // Выдача 2 карт каждому
             for (int i = 0; i < 10; i++) {
                 if (Ready[i]) {
@@ -296,9 +297,16 @@ namespace Server
             // Начиная с игрока слева от BB
             // Текущий игрок делает ставку
             // Если дошло до BB и он сделал Bet or Raise, то еще один круг
-            // Если был второй круг 
-            var curr = Next((BB + 1) % 10);
+            // Если был второй круг
+            RoundHistory.Clear();
+
+            var curr = Next((D + 1) % 10);
+            if (!Ready[curr])
+                curr = Next((curr + 1) % 10);
+            if (CurrentState == GameState.PreFlop)
+                curr = Next((BB + 1) % 10);
             var loopPointer = curr;
+            bool finish = false;
             while (Count > 1)
             {
                 BetHasBeenMade = false;
@@ -310,20 +318,35 @@ namespace Server
 
                 // Странно, нужно протестировать
                 // Нужно определить когда закончить раунд
-                if (loopPointer == Next((curr + 1) % 10) && PlayerBySeat[loopPointer].TableBet == PlayerBySeat[curr].TableBet)
+                if (IDS.Where(x => Ready[x] && PlayerBySeat[x].TableBet != roundMaxBet && PlayerBySeat[x].ChipBank != 0).Count() == 0)
+                {
+                    if (roundMaxBet != 0)
+                    {
+                        finish = true;
+                    }
+                    else if (Next((curr + 1) % 10) == loopPointer)
+                    {
+                        finish = true;
+                    }
+                }
+
+                if (finish)
                     break;
 
                 curr = Next((curr + 1) % 10);
             }
             if (Count == 1)
             {
+                // Определение кто это
                 for (int i = 0; i < 10; i++)
                 {
                     if (Ready[i])
                     {
                         Count = 0;
                         Ready[i] = false;
+                        CollectMoney();
                         RewardWinner(i);
+                        CurrentBank = 0;
                         return;
                     }
                 }
@@ -373,14 +396,30 @@ namespace Server
             if (betNode.PlayerBet == Bet.Bet)
             {
                 player.TableBet += betNode.Value;
+                // На случай когда AllIn меньше максимальной ставки в раунде 
+                roundMaxBet = Math.Max(player.TableBet, roundMaxBet);
                 player.ChipBank -= betNode.Value;
             }
             else if (betNode.PlayerBet == Bet.Call)
             {
-                var bet = RoundHistory[RoundHistory.Count - 2].Value;
+                var offset = 1;
+                var prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
+
+                while (prevBetNode.PlayerBet == Bet.Fold || prevBetNode.PlayerBet != Bet.Check)
+                {
+                    offset++;
+                    prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
+                }
+
+                int bet;
+                if (prevBetNode.PlayerBet == Bet.Bet)
+                    bet = PlayerBySeat[prevBetNode.Seat].TableBet;
+                else
+                    bet = prevBetNode.Value;
                 betNode.Value = bet;
-                player.TableBet += bet;
-                player.ChipBank -= RoundHistory[RoundHistory.Count - 2].Value;
+                var realBet = bet - player.TableBet;
+                player.TableBet += realBet;
+                player.ChipBank -= realBet;
             }
             else if (betNode.PlayerBet == Bet.Fold)
             {
@@ -389,10 +428,25 @@ namespace Server
             }
             else if (betNode.PlayerBet == Bet.Raise)
             {
-                var bet = RoundHistory[RoundHistory.Count - 2].Value * 2;
+                var offset = 1;
+                var prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
+
+                while (prevBetNode.PlayerBet == Bet.Fold || prevBetNode.PlayerBet != Bet.Check)
+                {
+                    offset++;
+                    prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
+                }
+
+                int bet;
+                if (prevBetNode.PlayerBet == Bet.Bet)
+                    bet = PlayerBySeat[prevBetNode.Seat].TableBet * 2;
+                else
+                    bet = prevBetNode.Value * 2;
+                roundMaxBet = bet;
                 betNode.Value = bet;
-                player.TableBet += bet;
-                player.ChipBank -= RoundHistory[RoundHistory.Count - 2].Value * 2;
+                var realBet = bet - player.TableBet;
+                player.TableBet += realBet;
+                player.ChipBank -= realBet;
             }
         }
 
