@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameLogic", "GameLogic\GameLogic.csproj", "{B4CDB86F-3057-4A29-88DC-DBFA53883C57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{B6AAB28F-5BBE-4BA5-9ED7-3C48D02DD2FF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{81082FD5-AE3B-4E7B-AC0C-FF6FB1A9D9CB} = {81082FD5-AE3B-4E7B-AC0C-FF6FB1A9D9CB}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{81082FD5-AE3B-4E7B-AC0C-FF6FB1A9D9CB}"
 EndProject

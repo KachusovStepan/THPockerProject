@@ -54,6 +54,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameTests.cs" />
     <Compile Include="CombinationDeterminantTests.cs" />
     <Compile Include="CombinationTests.cs" />
     <Compile Include="Helper.cs" />
@@ -66,6 +67,10 @@
     <ProjectReference Include="..\GameLogic\GameLogic.csproj">
       <Project>{b4cdb86f-3057-4a29-88dc-dbfa53883c57}</Project>
       <Name>GameLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Server\Server.csproj">
+      <Project>{81082fd5-ae3b-4e7b-ac0c-ff6fb1a9d9cb}</Project>
+      <Name>Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
