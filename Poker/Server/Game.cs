@@ -61,25 +61,27 @@ namespace Server
             { GameState.ShowTime, 's' }
         };
 
-        private int MinBet;
+        private static HashSet<int> gameIds;
+
+        public int MinBet { get; private set; }
         public readonly int GameId;
-        public static int[] IDS;
-        public List<BetNode> RoundHistory;
-        public Dictionary<int, PlayerInfo> PlayerBySeat;
-        public Dictionary<int, PlayerInfo> PlayerByID;
-        public GameState CurrentState;
-        public int Count = 0;
-        public bool[] Ready;
-        public int SB = 0;
-        public int BB = 0;
-        public int D = 0;
-        public bool BetHasBeenMade;
-        public int CurrentPlayer;
-        public int CurrentBank;
-        public List<Card> TableCards;
-        public static CardDeck Deck;
-        private List<string> chat;
-        private int roundMaxBet;
+        public static int[] IDS { get; private set; }
+        public List<BetNode> RoundHistory { get; private set; }
+        public Dictionary<int, PlayerInfo> PlayerBySeat { get; private set; }
+        public Dictionary<int, PlayerInfo> PlayerByID { get; private set; }
+        public GameState CurrentState { get; private set; }
+        public int Count { get; private set; }
+        public bool[] Ready { get; private set; }
+        public int SmallBlindSeat { get; private set; }
+        public int BigBlindSeat { get; private set; }
+        public int DealerSeat { get; private set; }
+        public bool BetHasBeenMade { get; set; }
+        public int CurrentPlayer { get; private set; } 
+        public int CurrentBank { get; private set; }
+        public List<Card> TableCards { get; private set; }
+        public static CardDeck Deck { get; private set; }
+        public List<string> chat { get; private set; }
+        public int roundMaxBet { get; private set; }
         public readonly Dictionary<int, BetNode> PlayerBets;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
@@ -87,6 +89,10 @@ namespace Server
         // Multiton
         private Game(int gameId)
         {
+            gameIds.Add(gameId);
+            SmallBlindSeat = 0;
+            BigBlindSeat = 0;
+            DealerSeat = 0;
             GameId = gameId;
             IDS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             RoundHistory = new List<BetNode>();
@@ -107,7 +113,14 @@ namespace Server
 
             return GameInstances[gameId];
         }
-        
+
+        public static void DeleteGame(int gameId) {
+            gameIds.Remove(gameId);
+            GameInstances.Remove(gameId);
+        }
+        public static HashSet<int> ListGameIds() {
+            return gameIds;
+        }
 
         public bool GetName(int id, out string name)
         {
@@ -115,6 +128,26 @@ namespace Server
             if (PlayerByID.ContainsKey(id))
                 name = PlayerByID[id].Name;
             return true;
+        }
+
+        public List<string> ListPlayerNames() {
+            var names = new List<string>();
+            for (int i = 0; i < 10; i++)
+            {
+                if (PlayerBySeat.ContainsKey(i))
+                {
+                    names.Add(PlayerBySeat[i].Name);
+                }
+                else {
+                    names.Add(null);
+                }
+            }
+
+            return names;
+        }
+
+        public char GetRound() {
+            return turnChar[CurrentState];
         }
 
         public static Dictionary<int, int> ShowGames()
@@ -177,15 +210,17 @@ namespace Server
 
         public State GetGameState()
         {
+            var tableBanks = new Dictionary<int, int>();
             var banks = new Dictionary<int, int>();
             var seatNames = new Dictionary<int, string>();
             foreach (var seat in PlayerBySeat.Keys)
             {
+                tableBanks.Add(seat, PlayerBySeat[seat].TableBet);
                 banks.Add(seat, PlayerBySeat[seat].ChipBank);
                 seatNames.Add(seat, PlayerBySeat[seat].Name);
             }
-            var blindSeats = new Dictionary<char, int> { { 'd', D }, { 's', SB }, { 'b', BB } };
-            var state = new State(PlayerByID.Count, banks, CurrentBank, seatNames, blindSeats, turnChar[CurrentState], CurrentPlayer);
+            var blindSeats = new Dictionary<char, int> { { 'd', DealerSeat }, { 's', SmallBlindSeat }, { 'b', BigBlindSeat } };
+            var state = new State(PlayerByID.Count, banks, tableBanks, CurrentBank, CurrentPlayer);
             return state;
         }
 
@@ -279,9 +314,9 @@ namespace Server
             // Текущий игрок делает ставку
             // Если дошло до BB и он сделал Bet or Raise, то еще один круг
             // Если был второй круг
-            var current = Next((D + 1) % 10);
+            var current = Next((DealerSeat + 1) % 10);
             if (CurrentState == GameState.PreFlop)
-                current = Next((BB + 1) % 10);
+                current = Next((BigBlindSeat + 1) % 10);
             var sumOfBetsBySeat = PlayerBets.ToDictionary(pair => pair.Key, pair => 0);
             BetNode bet;
 
@@ -329,9 +364,9 @@ namespace Server
 
         public void SetInitialRoles()
         {
-            D = Next(0);
-            SB = Next((D + 1) % 10);
-            BB = Next((SB + 1) % 10);
+            DealerSeat = Next(0);
+            SmallBlindSeat = Next((DealerSeat + 1) % 10);
+            BigBlindSeat = Next((SmallBlindSeat + 1) % 10);
         }
 
         public int Next(int start)
@@ -349,9 +384,9 @@ namespace Server
             Count = Ready.Where(x => x).Count();
             if (Count == 1)
                 return;
-            D = SB;
-            SB = BB;
-            BB = Next((SB + 1) % 10);
+            DealerSeat = SmallBlindSeat;
+            SmallBlindSeat = BigBlindSeat;
+            BigBlindSeat = Next((SmallBlindSeat + 1) % 10);
         }
 
         // Плохое ожидание

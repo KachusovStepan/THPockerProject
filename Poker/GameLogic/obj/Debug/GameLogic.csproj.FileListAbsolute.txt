@@ -4,3 +4,4 @@ C:\repos\THPokerProject\Poker\GameLogic\bin\Debug\GameLogic.pdb
 C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.csproj.CoreCompileInputs.cache
 C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.exe
 C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.pdb
+C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.csprojAssemblyReference.cache

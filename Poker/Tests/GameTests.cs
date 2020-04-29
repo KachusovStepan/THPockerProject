@@ -40,9 +40,9 @@ namespace Tests
             var expectedBB = expected[2];
 
             g.SetInitialRoles();
-            Assert.AreEqual(expectedD, g.D);
-            Assert.AreEqual(expectedSB, g.SB);
-            Assert.AreEqual(expectedBB, g.BB);
+            Assert.AreEqual(expectedD, g.DealerSeat);
+            Assert.AreEqual(expectedSB, g.SmallBlindSeat);
+            Assert.AreEqual(expectedBB, g.BigBlindSeat);
         }
 
         [TestCase("111", "012 120 201")]
@@ -62,9 +62,9 @@ namespace Tests
                 var expectedD = e[0];
                 var expectedSB = e[1];
                 var expectedBB = e[2];
-                Assert.AreEqual(expectedD, g.D);
-                Assert.AreEqual(expectedSB, g.SB);
-                Assert.AreEqual(expectedBB, g.BB);
+                Assert.AreEqual(expectedD, g.DealerSeat);
+                Assert.AreEqual(expectedSB, g.SmallBlindSeat);
+                Assert.AreEqual(expectedBB, g.BigBlindSeat);
                 g.Update();
             }
         }

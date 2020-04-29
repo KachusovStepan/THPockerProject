@@ -44,8 +44,27 @@ namespace Server
 
         [OperationContract]
         State GetState(int gameId);
+
+        [OperationContract]
+        string CheckTableCards(int gameId);
+
+        [OperationContract]
+        char CheckRound(int gameId);
+
+        [OperationContract]
+        List<string> CheckPlayerNames(int gameId);
+
+        [OperationContract]
+        Dictionary<char, int> CheckRoles(int gameId);
+
+        [OperationContract]
+        bool[] CheckAlive(int gameId);
     }
 
+    [DataContract(Namespace = "OtherNamespace")]
+    public class FastState {
+    
+    }
 
     [DataContract(Namespace = "OtherNamespace")]
     public class State
@@ -57,28 +76,20 @@ namespace Server
         public Dictionary<int, int> Banks;
 
         [DataMember]
+        public Dictionary<int, int> TableBanks;
+
+        [DataMember]
         public int TableBank;
-
-        [DataMember]
-        public Dictionary<int, string> Seats;
-
-        [DataMember]
-        public Dictionary<char, int> Roles;
-
-        [DataMember]
-        public char Round;
 
         [DataMember]
         public int CurrentPlayer;
 
-        public State(int playerCount, Dictionary<int, int> banks, int tableBank, Dictionary<int, string> seatNames, Dictionary<char, int> blindSeats, char currRound, int currPlayer)
+        public State(int playerCount, Dictionary<int, int> banks, Dictionary<int, int> tableBanks, int tableBank, int currPlayer)
         {
             PlayerCount = playerCount;
             Banks = banks;
             TableBank = tableBank;
-            Seats = seatNames;
-            Roles = blindSeats;
-            Round = currRound;
+            TableBanks = tableBanks;
             CurrentPlayer = currPlayer;
         }
     }
@@ -112,6 +123,8 @@ namespace Server
         public bool CreateNewGame(int gameId)
         {
             var successed = Game.CreateNewGame(gameId);
+            if (successed)
+                Program.GamesToStart.Enqueue(gameId);
             return successed;
         }
 
@@ -202,13 +215,9 @@ namespace Server
 
         private bool DoPlayerBet(int gameId, int playerId, Bet bet, int value)
         {
-            var games = Game.ShowGames();
-            if (!games.ContainsKey(gameId) || Game.GetGameInstance(gameId).PlayerByID.ContainsKey(playerId))
-            {
+            var game = TryGetGame(gameId);
+            if (game is null)
                 return false;
-            }
-
-            var game = Game.GetGameInstance(gameId);
 
             var playerInfo = game.PlayerByID[playerId];
             if (game.CurrentPlayer != playerInfo.Position)
@@ -226,6 +235,67 @@ namespace Server
             game.PlayerBets[playerInfo.Position] = playerBet;
             game.BetHasBeenMade = true;
             return true;
+        }
+
+        public string CheckTableCards(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            var tableCards = Game.GetGameInstance(gameId).TableCards;
+            var res = String.Empty;
+            foreach (var card in tableCards) {
+                res += String.Format("{0} ", card.GetSimpleRepresentation());
+            }
+            res = res.Substring(0, res.Length - 1);
+            return res;
+        }
+
+        public char CheckRound(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return char.MinValue;
+            return game.GetRound();
+        }
+
+        public List<string> CheckPlayerNames(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            return game.ListPlayerNames();
+        }
+
+        public Dictionary<char, int> CheckRoles(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            var blindSeats = new Dictionary<char, int> { { 'd', game.DealerSeat }, { 's', game.SmallBlindSeat }, { 'b', game.BigBlindSeat } };
+            return blindSeats;
+        }
+
+        public bool[] CheckAlive(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            return game.Ready;
+        }
+
+        private Game TryGetGame(int gameId)
+        {
+            if (!Game.ListGameIds().Contains(gameId))
+            {
+                return null;
+            }
+
+            return Game.GetGameInstance(gameId);
         }
     }
 }
