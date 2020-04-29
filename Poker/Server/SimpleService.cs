@@ -25,13 +25,10 @@ namespace Server
         bool LeaveTheGame(int gameId, int playerId);
 
         [OperationContract]
-        bool DoBet(int gameId, int playerId, int bet);
+        bool DoRaise(int gameId, int playerId, int bet);
 
         [OperationContract]
         bool DoCall(int gameId, int playerId);
-
-        [OperationContract]
-        bool DoRaise(int gameId, int playerId);
 
         [OperationContract]
         bool DoFold(int gameId, int playerId);
@@ -179,7 +176,7 @@ namespace Server
             return gameState;
         }
 
-        public bool DoBet(int gameId, int playerId, int bet)
+        public bool DoRaise(int gameId, int playerId, int bet)
         {
             var successed = DoPlayerBet(gameId, playerId, Bet.Bet, bet);
             return successed;
@@ -188,12 +185,6 @@ namespace Server
         public bool DoCall(int gameId, int playerId)
         {
             var successed = DoPlayerBet(gameId, playerId, Bet.Call, 0);
-            return successed;
-        }
-
-        public bool DoRaise(int gameId, int playerId)
-        {
-            var successed = DoPlayerBet(gameId, playerId, Bet.Raise, 0);
             return successed;
         }
 
@@ -232,6 +223,7 @@ namespace Server
 
             var playerBet = new BetNode(playerId, playerInfo.Position, bet, value);
             game.RoundHistory.Add(playerBet);
+            game.PlayerBets[playerInfo.Position] = playerBet;
             game.BetHasBeenMade = true;
             return true;
         }

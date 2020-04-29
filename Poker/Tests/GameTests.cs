@@ -168,14 +168,9 @@ namespace Tests
             }
         }
 
-        [TestCase("b", "1", "99", "1", 1)]
-        [TestCase("b ch", "1 0", "99 100", "1 0", 2)]
-        [TestCase("b c", "1 1", "99 99", "1 1", 1)]
-        [TestCase("b b b b", "1 2 2 1", "97 97", "3 3", 2)]
-        [TestCase("b b r", "1 2 4", "99 98 96", "1 2 4", 3)]
-        [TestCase("b b f r", "1 2 0 4", "99 98 100 96", "1 2 0 4", 4)]
-        [TestCase("b b ch", "1 2 0", "99 98 100", "1 2 0", 3)]
-        public void ExecuteTest(
+        [TestCase("b b", "1 1", "99 99", "1 1", 2)]
+        [TestCase("b r c", "1 2 1", "98 98", "2 2", 2)]
+        public void BettingRoundTest(
             string betsStr,
             string valuesStr,
             string expectedPlayersBanksStr,
@@ -185,6 +180,7 @@ namespace Tests
             {
             var g = Game.GetGameInstance(0);
             Clear(g);
+            g.D = -1;
             var converted = ConvertFromString(betsStr, valuesStr,
                 expectedPlayersBanksStr, expectedTableBetsStr);
             var bets = converted.bets;
@@ -195,19 +191,19 @@ namespace Tests
             for (int i = 0; i < playersCount; i++)
             {
                 g.AddPlayer(i.ToString(), i);
+                g.Ready[i] = true;
             }
-            for (int i = 0; i < bets.Count; i++)
+            
+
+            g.BettingRound();
+
+            for (int i = 0; i < playersCount; i++)
             {
-                var seat = i % playersCount;
-                var bd = new BetNode(g.PlayerBySeat[seat].ID, seat, bets[i], values[i]);
-                g.Execute(bd);
                 Assert.AreEqual(expectedTableBets[i], g.PlayerBySeat[i].TableBet);
                 Assert.AreEqual(expectedPlayersBanks[i], g.PlayerBySeat[i].ChipBank);
-
-                // В самом классе история вообще не обновляется
-                g.RoundHistory.Add(bd);
             }
         }
+
 
         public (List<Bet> bets, List<int> values, List<int> playersBanks, List<int> tableBets) 
             ConvertFromString(

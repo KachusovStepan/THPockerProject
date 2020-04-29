@@ -80,6 +80,7 @@ namespace Server
         public static CardDeck Deck;
         private List<string> chat;
         private int roundMaxBet;
+        public readonly Dictionary<int, BetNode> PlayerBets;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
 
@@ -94,6 +95,7 @@ namespace Server
             Ready = new bool[10];
             TableCards = new List<Card>();
             Deck = new CardDeck();
+            PlayerBets = new Dictionary<int, BetNode>();
         }
         public static Game GetGameInstance(int gameId)
         {
@@ -189,57 +191,34 @@ namespace Server
 
         public void Start()
         {
-            for (int i = 0; i < 10; i++)
+            Func<Action, bool> conductBettingRoungAndReportIfGameIsOver = currentRound =>
             {
-                Ready[i] = PlayerBySeat.ContainsKey(i);
-            }
+                currentRound();
+                return Count == 0;
+            };
+            Action setReadyPlayers = () =>
+            {
+                for (int i = 0; i < 10; i++)
+                    Ready[i] = PlayerBySeat.ContainsKey(i);
+            };
 
-            // Назначние блайндов
+            setReadyPlayers();
             SetInitialRoles();
-
             while (true)
             {
+                Deck.Shuffle();
                 TableCards.Clear();
-                for (int i = 0; i < 10; i++)
-                {
-                    Ready[i] = PlayerBySeat.ContainsKey(i);
-                }
+                setReadyPlayers();
                 // Цикл раундов пока есть хотя бы 2 игрока
-                PreFlop();
-
+                if (conductBettingRoungAndReportIfGameIsOver(PreFlop)) break;
+                if (conductBettingRoungAndReportIfGameIsOver(Flop)) break;
+                if (conductBettingRoungAndReportIfGameIsOver(Turn)) break;
+                if (conductBettingRoungAndReportIfGameIsOver(River)) break;
                 Update();
-                if (Count == 0)
-                {
-                    continue;
-                }
-                Flop();
-
-                Update();
-                if (Count == 0)
-                {
-                    continue;
-                }
-                Turn();
-
-                Update();
-                if (Count == 0)
-                {
-                    continue;
-                }
-                River();
-
-                Update();
-                if (Count == 0)
-                {
-                    continue;
-                }
-                ShowDown();
             }
         }
         private void PreFlop()
         {
-            // Тасовка колоды
-            Deck.Shuffle();
             // TODO  Сделать слепые ставки
             // Выдача 2 карт каждому
             for (int i = 0; i < 10; i++) {
@@ -292,50 +271,45 @@ namespace Server
             // Прибавить в банк победившего игрока банк игры
             // RewardWinner(int seat)
         }
-        private void BettingRound()
+
+        // изменил на public для тестов
+        public void BettingRound()
         {
             // Начиная с игрока слева от BB
             // Текущий игрок делает ставку
             // Если дошло до BB и он сделал Bet or Raise, то еще один круг
             // Если был второй круг
-            RoundHistory.Clear();
-
-            var curr = Next((D + 1) % 10);
-            if (!Ready[curr])
-                curr = Next((curr + 1) % 10);
+            var current = Next((D + 1) % 10);
             if (CurrentState == GameState.PreFlop)
-                curr = Next((BB + 1) % 10);
-            var loopPointer = curr;
-            bool finish = false;
-            while (Count > 1)
+                current = Next((BB + 1) % 10);
+            var sumOfBetsBySeat = PlayerBets.ToDictionary(pair => pair.Key, pair => 0);
+            BetNode bet;
+
+            while (true)
             {
                 BetHasBeenMade = false;
-                CurrentPlayer = curr;
-                WaitForBet();
-                Execute(RoundHistory[RoundHistory.Count - 1]);
-                if (!Ready[loopPointer])
-                    loopPointer = Next((loopPointer + 1) % 10);
+                //WaitForBet();
+                bet = PlayerBets[current];
+                if (bet.PlayerBet == Bet.Call)
+                    bet.Value = roundMaxBet;
+                if (bet.PlayerBet == Bet.Fold)
+                    Ready[bet.Seat] = false;
+                Execute(bet);
 
-                // Странно, нужно протестировать
-                // Нужно определить когда закончить раунд
-                if (IDS.Where(x => Ready[x] && PlayerBySeat[x].TableBet != roundMaxBet && PlayerBySeat[x].ChipBank != 0).Count() == 0)
-                {
-                    if (roundMaxBet != 0)
-                    {
-                        finish = true;
-                    }
-                    else if (Next((curr + 1) % 10) == loopPointer)
-                    {
-                        finish = true;
-                    }
-                }
-
-                if (finish)
+                sumOfBetsBySeat[current] = bet.Value;
+                if (sumOfBetsBySeat
+                    .Where(pair => Ready[pair.Value])
+                    .GroupBy(pair => pair.Value)
+                    .Count() == 1)
                     break;
-
-                curr = Next((curr + 1) % 10);
+                current = Next((current + 1) % 10);
             }
-            if (Count == 1)
+            //CheckWinner();
+        }
+
+        public void CheckWinner()
+        {
+            if (Ready.Count(x => x) == 1)
             {
                 // Определение кто это
                 for (int i = 0; i < 10; i++)
@@ -393,61 +367,9 @@ namespace Server
         public void Execute(BetNode betNode)
         {
             var player = PlayerBySeat[betNode.Seat];
-            if (betNode.PlayerBet == Bet.Bet)
-            {
-                player.TableBet += betNode.Value;
-                // На случай когда AllIn меньше максимальной ставки в раунде 
-                roundMaxBet = Math.Max(player.TableBet, roundMaxBet);
-                player.ChipBank -= betNode.Value;
-            }
-            else if (betNode.PlayerBet == Bet.Call)
-            {
-                var offset = 1;
-                var prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
-
-                while (prevBetNode.PlayerBet == Bet.Fold || prevBetNode.PlayerBet != Bet.Check)
-                {
-                    offset++;
-                    prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
-                }
-
-                int bet;
-                if (prevBetNode.PlayerBet == Bet.Bet)
-                    bet = PlayerBySeat[prevBetNode.Seat].TableBet;
-                else
-                    bet = prevBetNode.Value;
-                betNode.Value = bet;
-                var realBet = bet - player.TableBet;
-                player.TableBet += realBet;
-                player.ChipBank -= realBet;
-            }
-            else if (betNode.PlayerBet == Bet.Fold)
-            {
-                Count--;
-                Ready[betNode.Seat] = false;
-            }
-            else if (betNode.PlayerBet == Bet.Raise)
-            {
-                var offset = 1;
-                var prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
-
-                while (prevBetNode.PlayerBet == Bet.Fold || prevBetNode.PlayerBet != Bet.Check)
-                {
-                    offset++;
-                    prevBetNode = RoundHistory[RoundHistory.Count - 1 - offset];
-                }
-
-                int bet;
-                if (prevBetNode.PlayerBet == Bet.Bet)
-                    bet = PlayerBySeat[prevBetNode.Seat].TableBet * 2;
-                else
-                    bet = prevBetNode.Value * 2;
-                roundMaxBet = bet;
-                betNode.Value = bet;
-                var realBet = bet - player.TableBet;
-                player.TableBet += realBet;
-                player.ChipBank -= realBet;
-            }
+            player.TableBet += betNode.Value;
+            player.ChipBank -= betNode.Value;
+            roundMaxBet = Math.Max(player.TableBet, roundMaxBet);
         }
 
         public void CollectMoney()
