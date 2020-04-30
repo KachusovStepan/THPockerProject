@@ -20,7 +20,7 @@ namespace Server
             var contractType = typeof(IContract);
             serviceHost = new ServiceHost(serviceType, uri);
             var binding = new BasicHttpBinding();
-            serviceHost.AddServiceEndpoint(contractType, binding, address);
+            serviceHost.AddServiceEndpoint(contractType, binding, "");
             serviceHost.Open();
             //Console.WriteLine("Press any key to finish");
             //Console.ReadKey();
