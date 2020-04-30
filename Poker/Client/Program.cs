@@ -10,14 +10,10 @@ namespace Client
 {
     class Program
     {
+        public static IContract Proxy;
         static void Main()
         {
-            Console.Title = "CLIENT";
-            var binding = new BasicHttpBinding();
-            var endpoint = new EndpointAddress("http://localhost:8000/ServiceWCF");
-            var channelFactory = new ChannelFactory<IContract>(binding, endpoint);
-
-            IContract service = channelFactory.CreateChannel();
+            Connect("http://localhost:8000/ServiceWCF");
 
             // Получили экземпляр proxy
             // Можно вызывать методы интерфейса Сервиса у service
@@ -25,6 +21,15 @@ namespace Client
             // Завершение
             Console.WriteLine("Press <Any Key> to finish Client");
             Console.ReadKey();
+        }
+
+        public static void Connect(string address) {
+            var binding = new BasicHttpBinding();
+            var endpoint = new EndpointAddress(address);
+            var channelFactory = new ChannelFactory<IContract>(binding, endpoint);
+
+            IContract service = channelFactory.CreateChannel();
+            Proxy = service;
         }
     }
 }
