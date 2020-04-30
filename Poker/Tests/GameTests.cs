@@ -180,7 +180,7 @@ namespace Tests
             {
             var g = Game.GetGameInstance(0);
             Clear(g);
-            g.D = -1;
+            g.DealerSeat = -1;
             var converted = ConvertFromString(betsStr, valuesStr,
                 expectedPlayersBanksStr, expectedTableBetsStr);
             var bets = converted.bets;

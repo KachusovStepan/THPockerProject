@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
-using System.Runtime.Serialization;
 
-namespace Client
+namespace ContractStorage
 {
     [ServiceContract]
-    interface IContract
+    public interface IContract
     {
         [OperationContract]
         Dictionary<int, int> ShowExistingGames();
@@ -58,56 +57,5 @@ namespace Client
 
         [OperationContract]
         bool[] CheckAlive(int gameId);
-    }
-
-    [DataContract(Namespace = "OtherNamespace")]
-    public class FastState
-    {
-
-    }
-
-    [DataContract(Namespace = "OtherNamespace")]
-    public class State
-    {
-        [DataMember]
-        public int PlayerCount;
-
-        [DataMember]
-        public Dictionary<int, int> Banks;
-
-        [DataMember]
-        public Dictionary<int, int> TableBanks;
-
-        [DataMember]
-        public int TableBank;
-
-        [DataMember]
-        public int CurrentPlayer;
-
-        public State(int playerCount, Dictionary<int, int> banks, Dictionary<int, int> tableBanks, int tableBank, int currPlayer)
-        {
-            PlayerCount = playerCount;
-            Banks = banks;
-            TableBank = tableBank;
-            TableBanks = tableBanks;
-            CurrentPlayer = currPlayer;
-        }
-    }
-
-
-    [DataContract(Namespace = "OtherNamespace")]
-    public class Point
-    {
-        [DataMember]
-        public double X;
-
-        [DataMember]
-        public double Y;
-
-        public Point(double x, double y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using GameLogic;
+using ContractStorage;
 
 namespace Server
 {
@@ -61,27 +62,27 @@ namespace Server
             { GameState.ShowTime, 's' }
         };
 
-        private static HashSet<int> gameIds;
+        private static HashSet<int> gameIds = new HashSet<int>();
 
         public int MinBet { get; private set; }
         public readonly int GameId;
-        public static int[] IDS { get; private set; }
-        public List<BetNode> RoundHistory { get; private set; }
-        public Dictionary<int, PlayerInfo> PlayerBySeat { get; private set; }
-        public Dictionary<int, PlayerInfo> PlayerByID { get; private set; }
-        public GameState CurrentState { get; private set; }
-        public int Count { get; private set; }
-        public bool[] Ready { get; private set; }
-        public int SmallBlindSeat { get; private set; }
-        public int BigBlindSeat { get; private set; }
-        public int DealerSeat { get; private set; }
+        public static int[] IDS { get; set; }
+        public List<BetNode> RoundHistory { get; set; }
+        public Dictionary<int, PlayerInfo> PlayerBySeat { get; set; }
+        public Dictionary<int, PlayerInfo> PlayerByID { get; set; }
+        public GameState CurrentState { get; set; }
+        public int Count { get; set; }
+        public bool[] Ready { get; set; }
+        public int SmallBlindSeat { get; set; }
+        public int BigBlindSeat { get; set; }
+        public int DealerSeat { get; set; }
         public bool BetHasBeenMade { get; set; }
-        public int CurrentPlayer { get; private set; } 
-        public int CurrentBank { get; private set; }
-        public List<Card> TableCards { get; private set; }
-        public static CardDeck Deck { get; private set; }
-        public List<string> chat { get; private set; }
-        public int roundMaxBet { get; private set; }
+        public int CurrentPlayer { get; set; }
+        public int CurrentBank { get; set; }
+        public List<Card> TableCards { get; set; }
+        public static CardDeck Deck { get; set; }
+        public List<string> chat { get; set; }
+        public int roundMaxBet { get; set; }
         public readonly Dictionary<int, BetNode> PlayerBets;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
@@ -108,6 +109,7 @@ namespace Server
             if (!GameInstances.ContainsKey(gameId))
             {
                 var newGame = new Game(gameId);
+                Game.gameIds.Add(gameId);
                 Game.GameInstances.Add(gameId, newGame);
             }
 
