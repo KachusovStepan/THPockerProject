@@ -249,6 +249,7 @@ namespace Server
                 if (conductBettingRoungAndReportIfGameIsOver(Flop)) break;
                 if (conductBettingRoungAndReportIfGameIsOver(Turn)) break;
                 if (conductBettingRoungAndReportIfGameIsOver(River)) break;
+                ShowDown();
                 Update();
             }
         }
