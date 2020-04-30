@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
+using ContractStorage;
 
 namespace Client
 {
@@ -22,7 +23,7 @@ namespace Client
             // Можно вызывать методы интерфейса Сервиса у service
 
             // Завершение
-            Console.WriteLine("Зress <Any Key> to finish Client");
+            Console.WriteLine("Press <Any Key> to finish Client");
             Console.ReadKey();
         }
     }

@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{81082FD5-AE3B-4E7B-AC0C-FF6FB1A9D9CB}</ProjectGuid>
+    <ProjectGuid>{A98C6BEE-4E89-441B-8989-B36298D8FA47}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Server</RootNamespace>
-    <AssemblyName>Server</AssemblyName>
+    <RootNamespace>ContractStorage</RootNamespace>
+    <AssemblyName>ContractStorage</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -45,23 +45,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Game.cs" />
+    <Compile Include="PokerServiceContract.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleService.cs" />
+    <Compile Include="StateDataContract.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ContractStorage\ContractStorage.csproj">
-      <Project>{a98c6bee-4e89-441b-8989-b36298d8fa47}</Project>
-      <Name>ContractStorage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GameLogic\GameLogic.csproj">
-      <Project>{b4cdb86f-3057-4a29-88dc-dbfa53883c57}</Project>
-      <Name>GameLogic</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
