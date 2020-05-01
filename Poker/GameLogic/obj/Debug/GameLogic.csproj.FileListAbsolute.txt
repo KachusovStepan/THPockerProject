@@ -4,3 +4,10 @@ C:\repos\THPokerProject\Poker\GameLogic\bin\Debug\GameLogic.pdb
 C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.csproj.CoreCompileInputs.cache
 C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.exe
 C:\repos\THPokerProject\Poker\GameLogic\obj\Debug\GameLogic.pdb
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\obj\Debug\GameLogic.csprojAssemblyReference.cache
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\obj\Debug\GameLogic.csproj.CoreCompileInputs.cache
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\obj\Debug\GameLogic.exe
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\obj\Debug\GameLogic.pdb
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\bin\Debug\GameLogic.exe.config
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\bin\Debug\GameLogic.exe
+D:\_учеба\progs\C#\Игра\Poker\GameLogic\bin\Debug\GameLogic.pdb

@@ -243,6 +243,7 @@ namespace Server
             SetInitialRoles();
             while (true)
             {
+                CheckWinner();
                 if (Count < 2)
                     break;
                 Deck.Shuffle();
@@ -306,19 +307,18 @@ namespace Server
 
         private void ShowDown()
         {
-            // Вскрытие карт всеми оставшимися
-            // Определить игрока с самой старшей комбинацией
-            // Прибавить в банк победившего игрока банк игры
-            // RewardWinner(int seat)
+            var winnersAndTheirCombinations = Ready
+                .Select((flag, seat) => (flag, seat))
+                .Where(pair => pair.flag)
+                .Select(pair => PlayerBySeat[pair.seat])
+                .Select(player => (player, new Combination(player.Hand, TableCards)))
+                .GroupBy(pair => pair.Item2)
+                .Max()
+                .ToList();
         }
 
-        // изменил на public для тестов
-        public void BettingRound()
+        private void BettingRound()
         {
-            // Начиная с игрока слева от BB
-            // Текущий игрок делает ставку
-            // Если дошло до BB и он сделал Bet or Raise, то еще один круг
-            // Если был второй круг
             var current = Next((CurrentState == GameState.PreFlop ? DealerSeat : BigBlindSeat) + 1);
             var sumOfBetsBySeat = PlayerBets.ToDictionary(pair => pair.Key, pair => 0);
             BetNode bet;
@@ -342,7 +342,6 @@ namespace Server
                     break;
                 current = Next(current + 1);
             }
-            CheckWinner();
         }
 
         public void CheckWinner()

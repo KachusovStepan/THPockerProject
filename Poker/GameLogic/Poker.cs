@@ -26,7 +26,7 @@ namespace GameLogic
         NotStart,
         PreFlop,
         Flop,
-        Turn, // Turn
+        Turn,
         River,
         ShowTime
     }
@@ -38,19 +38,17 @@ namespace GameLogic
         InGame
     }
 
-    public enum CardCombination {
+    public enum CardCombination 
+    {
         HighCard,
         Pair,
         TwoPair,
         ThreeOfAKind,
         Straight,
-        Flush,
+        Flash,
         FullHouse,
         FourOfAKind,
-        StraightFlush,
+        StraightFlash,
         RoyalFlash
-    }
-    class Poker
-    {
     }
 }
