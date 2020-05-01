@@ -23,6 +23,9 @@ namespace ContractStorage
         bool LeaveTheGame(int gameId, int playerId);
 
         [OperationContract]
+        bool DoBet(int gameId, int playerId, int bet);
+
+        [OperationContract]
         bool DoRaise(int gameId, int playerId, int bet);
 
         [OperationContract]

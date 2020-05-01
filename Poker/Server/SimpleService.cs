@@ -83,9 +83,15 @@ namespace Server
             return gameState;
         }
 
-        public bool DoRaise(int gameId, int playerId, int bet)
+        public bool DoBet(int gameId, int playerId, int bet)
         {
             var successed = DoPlayerBet(gameId, playerId, Bet.Bet, bet);
+            return successed;
+        }
+
+        public bool DoRaise(int gameId, int playerId, int bet)
+        {
+            var successed = DoPlayerBet(gameId, playerId, Bet.Raise, bet);
             return successed;
         }
 

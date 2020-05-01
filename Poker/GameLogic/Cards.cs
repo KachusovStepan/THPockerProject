@@ -178,6 +178,17 @@ namespace GameLogic
                 compRes = 1;
             return compRes;
         }
+
+        public static List<Card> ParseCards(string stringCards) {
+            var splitedCardString = stringCards.Split(' ');
+            var cards = new List<Card>();
+            foreach (var card in splitedCardString)
+            {
+                cards.Add(new Card(charSuits[card[0]], charRanks[card[1]]));
+            }
+
+            return cards;
+        }
     }
 
     public class CardDeck : ICardDeck
