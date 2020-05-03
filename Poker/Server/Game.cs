@@ -66,23 +66,23 @@ namespace Server
 
         public int MinBet { get; private set; }
         public readonly int GameId;
-        public static int[] IDS { get; set; }
-        public List<BetNode> RoundHistory { get; set; }
-        public Dictionary<int, PlayerInfo> PlayerBySeat { get; set; }
-        public Dictionary<int, PlayerInfo> PlayerByID { get; set; }
-        public GameState CurrentState { get; set; }
+        public static int[] IDs { get; private set; }
+        public List<BetNode> RoundHistory { get; private set; }
+        public Dictionary<int, PlayerInfo> PlayerBySeat { get; private set; }
+        public Dictionary<int, PlayerInfo> PlayerByID { get; private set; }
+        public GameState CurrentState { get; private set; }
         public int Count { get; set; }
-        public bool[] Ready { get; set; }
-        public int SmallBlindSeat { get; set; }
-        public int BigBlindSeat { get; set; }
-        public int DealerSeat { get; set; }
+        public bool[] Ready { get; private set; }
+        public int SmallBlindSeat { get; private set; }
+        public int BigBlindSeat { get; private set; }
+        public int DealerSeat { get; private set; }
         public bool BetHasBeenMade { get; set; }
-        public int CurrentPlayer { get; set; }
-        public int CurrentBank { get; set; }
-        public List<Card> TableCards { get; set; }
-        public static CardDeck Deck { get; set; }
-        public List<string> chat { get; set; }
-        public int roundMaxBet { get; set; }
+        public int CurrentPlayer { get; private set; }
+        public int CurrentBank { get; private set; }
+        public List<Card> TableCards { get; private set; }
+        public static CardDeck Deck { get; private set; }
+        public List<string> chat { get; private set; }
+        public int roundMaxBet { get; private set; }
         public readonly Dictionary<int, BetNode> PlayerBets;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
@@ -95,7 +95,7 @@ namespace Server
             BigBlindSeat = 0;
             DealerSeat = 0;
             GameId = gameId;
-            IDS = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            IDs = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             RoundHistory = new List<BetNode>();
             PlayerBySeat = new Dictionary<int, PlayerInfo>();
             PlayerByID = new Dictionary<int, PlayerInfo>();
@@ -176,7 +176,7 @@ namespace Server
             if (PlayerBySeat.ContainsKey(position))
                 return -1;
             var player = new PlayerInfo(name, position);
-            var id = IDS.Where(x => !PlayerByID.ContainsKey(x)).FirstOrDefault();
+            var id = IDs.Where(x => !PlayerByID.ContainsKey(x)).FirstOrDefault();
             PlayerByID.Add(id, player);
             PlayerBySeat.Add(position, player);
             return id;
@@ -228,10 +228,10 @@ namespace Server
 
         public void Start()
         {
-            Func<Action, bool> conductBettingRoungAndReportIfGameIsOver = currentRound =>
+            Func<Action, bool> conductBettingRoungAndReportIfRoundIsOver = currentRound =>
             {
                 currentRound();
-                return Count == 0;
+                return Ready.Count(x => x) < 2;
             };
             Action setReadyPlayers = () =>
             {
@@ -243,14 +243,18 @@ namespace Server
             SetInitialRoles();
             while (true)
             {
+                CheckWinner();
+                if (Count < 2)
+                    break;
                 Deck.Shuffle();
                 TableCards.Clear();
                 setReadyPlayers();
                 // Цикл раундов пока есть хотя бы 2 игрока
-                if (conductBettingRoungAndReportIfGameIsOver(PreFlop)) break;
-                if (conductBettingRoungAndReportIfGameIsOver(Flop)) break;
-                if (conductBettingRoungAndReportIfGameIsOver(Turn)) break;
-                if (conductBettingRoungAndReportIfGameIsOver(River)) break;
+                if (conductBettingRoungAndReportIfRoundIsOver(PreFlop)) continue;
+                if (conductBettingRoungAndReportIfRoundIsOver(Flop)) continue;
+                if (conductBettingRoungAndReportIfRoundIsOver(Turn)) continue;
+                if (conductBettingRoungAndReportIfRoundIsOver(River)) continue;
+                ShowDown();
                 Update();
             }
         }
@@ -303,29 +307,26 @@ namespace Server
 
         private void ShowDown()
         {
-            // Вскрытие карт всеми оставшимися
-            // Определить игрока с самой старшей комбинацией
-            // Прибавить в банк победившего игрока банк игры
-            // RewardWinner(int seat)
+            var winnersAndTheirCombinations = Ready
+                .Select((flag, seat) => (flag, seat))
+                .Where(pair => pair.flag)
+                .Select(pair => PlayerBySeat[pair.seat])
+                .Select(player => (player, new Combination(player.Hand, TableCards)))
+                .GroupBy(pair => pair.Item2)
+                .Max()
+                .ToList();
         }
 
-        // изменил на public для тестов
-        public void BettingRound()
+        private void BettingRound()
         {
-            // Начиная с игрока слева от BB
-            // Текущий игрок делает ставку
-            // Если дошло до BB и он сделал Bet or Raise, то еще один круг
-            // Если был второй круг
-            var current = Next((DealerSeat + 1) % 10);
-            if (CurrentState == GameState.PreFlop)
-                current = Next((BigBlindSeat + 1) % 10);
+            var current = Next((CurrentState == GameState.PreFlop ? DealerSeat : BigBlindSeat) + 1);
             var sumOfBetsBySeat = PlayerBets.ToDictionary(pair => pair.Key, pair => 0);
             BetNode bet;
 
             while (true)
             {
                 BetHasBeenMade = false;
-                //WaitForBet();
+                WaitForBet();
                 bet = PlayerBets[current];
                 if (bet.PlayerBet == Bet.Call)
                     bet.Value = roundMaxBet;
@@ -339,9 +340,8 @@ namespace Server
                     .GroupBy(pair => pair.Value)
                     .Count() == 1)
                     break;
-                current = Next((current + 1) % 10);
+                current = Next(current + 1);
             }
-            //CheckWinner();
         }
 
         public void CheckWinner()
@@ -367,13 +367,13 @@ namespace Server
         public void SetInitialRoles()
         {
             DealerSeat = Next(0);
-            SmallBlindSeat = Next((DealerSeat + 1) % 10);
-            BigBlindSeat = Next((SmallBlindSeat + 1) % 10);
+            SmallBlindSeat = Next(DealerSeat + 1);
+            BigBlindSeat = Next(SmallBlindSeat + 1);
         }
 
         public int Next(int start)
         {
-            var i = start;
+            var i = start % 10;
             while (!Ready[i])
             {
                 i = (i + 1) % 10;
@@ -388,7 +388,7 @@ namespace Server
                 return;
             DealerSeat = SmallBlindSeat;
             SmallBlindSeat = BigBlindSeat;
-            BigBlindSeat = Next((SmallBlindSeat + 1) % 10);
+            BigBlindSeat = Next(SmallBlindSeat + 1);
         }
 
         // Плохое ожидание

@@ -58,3 +58,6 @@ C:\repos\THPokerProject\Poker\Tests\bin\Debug\Server.exe.config
 C:\repos\THPokerProject\Poker\Tests\bin\Debug\ContractStorage.exe
 C:\repos\THPokerProject\Poker\Tests\bin\Debug\ContractStorage.pdb
 C:\repos\THPokerProject\Poker\Tests\bin\Debug\ContractStorage.exe.config
+D:\_учеба\progs\C#\Игра\Poker\Tests\bin\Debug\ContractStorage.exe
+D:\_учеба\progs\C#\Игра\Poker\Tests\bin\Debug\ContractStorage.pdb
+D:\_учеба\progs\C#\Игра\Poker\Tests\bin\Debug\ContractStorage.exe.config

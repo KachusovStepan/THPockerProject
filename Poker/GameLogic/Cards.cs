@@ -59,30 +59,11 @@ namespace GameLogic
             { 'a', CardRank.Ace },
         };
 
-        static Dictionary<CardSuit, char> suitChar = new Dictionary<CardSuit, char>
-        {
-            { CardSuit.Hearts, 'h' },
-            { CardSuit.Clubs, 'c' },
-            { CardSuit.Spades, 's'},
-            { CardSuit.Diamonds, 'd' }
-        };
+        static Dictionary<CardSuit, char> suitChar = 
+            charSuits.ToDictionary(pair => pair.Value, pair => pair.Key);
 
-        static Dictionary<CardRank, char> rankChar = new Dictionary<CardRank, char>
-        {
-            { CardRank.Two, '2' },
-            { CardRank.Three, '3' },
-            { CardRank.Four, '4' },
-            { CardRank.Five, '5' },
-            { CardRank.Six, '6' },
-            { CardRank.Seven, '7' },
-            { CardRank.Eight, '8' },
-            { CardRank.Nine, '9' },
-            { CardRank.Ten, '0' },
-            { CardRank.Jack, 'j' },
-            { CardRank.Queen, 'q' },
-            { CardRank.King, 'k' },
-            { CardRank.Ace, 'a'},
-        };
+        static Dictionary<CardRank, char> rankChar =
+            charRanks.ToDictionary(pair => pair.Value, pair => pair.Key);
 
         public readonly CardSuit Suit;
         public readonly CardRank Rank;
@@ -125,7 +106,15 @@ namespace GameLogic
 
         public override string ToString()
         {
-            return string.Format("({0} {1} {2})", Suit, Rank, IsOpen ? "Opened" : "Closed");
+            var converSuits = new Dictionary<CardSuit, string>
+            {
+                { CardSuit.Diamonds, "\u2662"},
+                { CardSuit.Hearts, "\u2661"},
+                { CardSuit.Clubs, "\u2667" },
+                { CardSuit.Spades, "\u2664" },
+                { CardSuit.NonSet, "NonSet" }
+            };
+            return string.Format("({0} {1}", rankChar[Rank].ToString().ToUpper(), converSuits[Suit]);
         }
 
         public string GetSimpleRepresentation()
@@ -136,11 +125,21 @@ namespace GameLogic
 
         public static bool operator ==(Card card1, Card card2)
         {
+            if (card1 is null)
+                return card2 is null;
+            if (card2 is null)
+                return card1 is null;
+                
             return card1.Suit == card2.Suit && card1.Rank == card2.Rank;
         }
 
         public static bool operator !=(Card card1, Card card2)
         {
+            if (card1 is null)
+                return !(card2 is null);
+            if (card2 is null)
+                return !(card1 is null);
+
             return !(card1 == card2);
         }
 
@@ -258,249 +257,11 @@ namespace GameLogic
 
     public class Hand
     {
-        private Tuple<Card, Card> cards = null;
-        public void GetCards(Tuple<Card, Card> cards)
+        public (Card first, Card second) Cards { get; }
+
+        public Hand(CardDeck deck)
         {
-            if (this.cards != null)
-            {
-                throw new InvalidOperationException("Hand already has cards");
-            }
-
-            this.cards = cards;
-        }
-    }
-
-    public class CombinationDeterminant
-    {
-
-        public static Tuple<bool, List<Card>> Straight(List<Card> cards)
-        {
-            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
-            bool aceFlag = sorted[0].Rank == CardRank.Ace;
-            var seq = new List<Card>();
-            seq.Add(sorted[0]);
-            for (int i = 0; i < sorted.Count - 1; i++)
-            {
-                if (seq.Count == 5)
-                    break;
-                if (sorted[i].Rank == sorted[i + 1].Rank + 1)
-                {
-                    seq.Add(sorted[i + 1]);
-                }
-                else if (sorted[i].Rank == sorted[i + 1].Rank)
-                {
-                    continue;
-                }
-                else
-                {
-
-                    seq.Clear();
-                    seq.Add(sorted[i + 1]);
-                }
-            }
-            if (seq[seq.Count - 1].Rank == CardRank.Two && aceFlag)
-            {
-                seq.Add(sorted[0]);
-            }
-            if (seq.Count == 5)
-                return Tuple.Create(true, seq);
-            else
-                return new Tuple<bool, List<Card>>(false, null);
-        }
-
-
-
-        public static Tuple<bool, List<Card>> Flash(List<Card> cards)
-        {
-            var suits = new Dictionary<CardSuit, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Suit).SelectMany(x => { suits[x.Key] = Tuple.Create(x.Count(), x.OrderBy(c => -(int)c.Rank).ToList()); return x; }).ToList();
-            foreach (var key in suits.Keys)
-            {
-                if (suits[key].Item1 >= 5)
-                    return Tuple.Create(true, suits[key].Item2.Take(5).ToList());
-            }
-            return new Tuple<bool, List<Card>>(false, null);
-        }
-
-        public static Tuple<bool, List<Card>> StraightFlash(List<Card> cards)
-        {
-            var suits = new Dictionary<CardSuit, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Suit).SelectMany(x => { suits[x.Key] = Tuple.Create(x.Count(), x.OrderBy(c => -(int)c.Rank).ToList()); return x; }).ToList();
-            foreach (var key in suits.Keys)
-            {
-                if (suits[key].Item1 >= 5)
-                {
-                    var res = Straight(suits[key].Item2);
-                    if (!res.Item1)
-                        break;
-                    return Tuple.Create(true, res.Item2);
-                }
-            }
-            return new Tuple<bool, List<Card>>(false, null);
-        }
-
-        public static Tuple<bool, List<Card>> RoyalFlash(List<Card> cards)
-        {
-            var res = StraightFlash(cards);
-            if (res.Item1 && res.Item2[4].Rank == CardRank.Ten)
-                return res;
-            return new Tuple<bool, List<Card>>(false, null);
-        }
-
-        public static Tuple<bool, List<Card>> FourOfAKind(List<Card> cards)
-        {
-            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
-
-            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
-            foreach (var key in ranks.Keys)
-            {
-                if (ranks[key].Item1 == 4)
-                {
-                    var res = ranks[key].Item2;
-                    foreach (var card in sorted)
-                    {
-                        if (card.Rank != res[0].Rank)
-                        {
-                            res.Add(card);
-                            break;
-                        }
-                    }
-                    return Tuple.Create(true, res);
-                }
-            }
-            return new Tuple<bool, List<Card>>(false, null);
-        }
-
-        public static Tuple<bool, List<Card>> ThreeOfAKind(List<Card> cards)
-        {
-            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
-
-            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
-            foreach (var key in ranks.Keys)
-            {
-                if (ranks[key].Item1 == 3)
-                {
-                    var res = ranks[key].Item2;
-                    foreach (var card in sorted)
-                    {
-                        if (card.Rank != res[0].Rank)
-                        {
-                            res.Add(card);
-                            if (res.Count == 5)
-                                break;
-                        }
-                    }
-                    return Tuple.Create(true, res);
-                }
-            }
-            return new Tuple<bool, List<Card>>(false, null);
-        }
-
-        public static Tuple<bool, List<Card>> Pair(List<Card> cards)
-        {
-            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
-            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
-            foreach (var key in ranks.Keys)
-            {
-                if (ranks[key].Item1 == 2)
-                {
-                    var res = ranks[key].Item2;
-                    foreach (var card in sorted)
-                    {
-                        if (card.Rank != res[0].Rank)
-                        {
-                            res.Add(card);
-                            if (res.Count == 5)
-                                break;
-                        }
-                    }
-                    return Tuple.Create(true, res);
-                }
-            }
-            return new Tuple<bool, List<Card>>(false, null);
-        }
-
-        public static Tuple<bool, List<Card>> TwoPairs(List<Card> cards)
-        {
-            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
-
-            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
-            var res = new List<Card>();
-            foreach (var group in ranks.Where(x => x.Value.Item1 == 2).OrderBy(x => -(int)x.Key).Take(2))
-            {
-                res.Add(group.Value.Item2[0]);
-                res.Add(group.Value.Item2[1]);
-            }
-            if (res.Count != 4)
-                return new Tuple<bool, List<Card>>(false, null);
-
-            // Нужна только одна карта, поэтому ошибка отбоса пары не возникнет
-            foreach (var card in sorted.Where(x => !res.Contains(x)))
-            {
-                res.Add(card);
-                break;
-            }
-
-            return Tuple.Create(true, res);
-        }
-
-        public static Tuple<bool, List<Card>> FullHouse(List<Card> cards)
-        {
-            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
-
-            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
-            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
-            var res = new List<Card>();
-            foreach (var group in ranks.Where(x => x.Value.Item1 == 3).OrderBy(x => -(int)x.Key))
-            {
-                res.Add(group.Value.Item2[0]);
-                res.Add(group.Value.Item2[1]);
-                res.Add(group.Value.Item2[1]);
-                break;
-            }
-            if (res.Count != 3)
-                return new Tuple<bool, List<Card>>(false, null);
-
-            foreach (var group in ranks.Where(x => x.Value.Item1 == 2).OrderBy(x => -(int)x.Key))
-            {
-                res.Add(group.Value.Item2[0]);
-                res.Add(group.Value.Item2[1]);
-                break;
-            }
-            if (res.Count != 5)
-                return new Tuple<bool, List<Card>>(false, null);
-
-            return Tuple.Create(true, res);
-        }
-
-        public static Tuple<bool, List<Card>> HighCard(List<Card> cards)
-        {
-            var res = cards.OrderBy(x => -(int)x.Rank).Take(5).ToList();
-            return Tuple.Create(true, res);
-        }
-
-        public static int CompareCombinations(List<Card> comb1, List<Card> comb2)
-        {
-            var res = 0;
-            for (var i = 0; i < comb1.Count; i++)
-            {
-                if (comb1[i] > comb2[i])
-                {
-                    res = 1;
-                    break;
-                }
-                else if (comb1[i] < comb2[i])
-                {
-                    res = -1;
-                    break;
-                }
-            }
-
-            return res;
+            Cards = (deck.GetCard(), deck.GetCard());
         }
     }
 }

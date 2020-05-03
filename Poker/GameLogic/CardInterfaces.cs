@@ -17,8 +17,4 @@ namespace GameLogic
         void FillDeck();
         void SetReady();
     }
-
-    public interface ICombination : IComparable {
-        //CardCombination DetermineCardCombination(List<Card> card);
-    }
 }

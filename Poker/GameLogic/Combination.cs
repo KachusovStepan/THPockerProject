@@ -6,113 +6,242 @@ using System.Threading.Tasks;
 
 namespace GameLogic
 {
-    public class Combination : ICombination
+    public class Combination : IComparable
     {
-        private readonly List<Card> cards;
-        public CardCombination combination { get; private set; }
+        public CardCombination CardCombination { get; private set; }
+        public List<Card> HandRank { get; private set; }
+        public List<Card> Kickers { get; private set; }
+        public List<Card> FullCombination { get => HandRank.Concat(Kickers).ToList(); }
+
+        public Combination(Tuple<Card, Card> hand, List<Card> tableCards)
+            : this(new[] { hand.Item1, hand.Item2 }.Concat(tableCards).ToList()) { }
+
         public Combination(List<Card> cards)
         {
-            this.cards = cards.OrderBy(x => x.Rank).ToList();
-        }
-
-        // need tests
-        // use delegates in collection to determine combinations
-        private CardCombination DetermineCardCombination(List<Card> cards)  
-        {
-            return CombinationHelper.GetAllCombinationsChecks()
-                .Where(combinationCheck => combinationCheck.Check(cards))
-                .Select(combinationCheck => combinationCheck.Comb)
-                .FirstOrDefault();
-        }
-
-        public int CompareTo(object obj)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public static class CombinationHelper
-    {
-        public static List<(CardCombination Comb, Func<List<Card>, bool> Check)> GetAllCombinationsChecks()
-        {
-            return new List<(CardCombination, Func<List<Card>, bool>)>
+            var checks = new List<Func<List<Card>, bool>>
             {
-                ( CardCombination.RoyalFlash, IsRoyalFlash ),
-                ( CardCombination.StraightFlush, IsStraightFlash ),
-                ( CardCombination.FullHouse, IsFullHouse ),
-                ( CardCombination.Straight, IsStraight ),
-                ( CardCombination.Flush, IsFlash ),
-                ( CardCombination.ThreeOfAKind, IsThreeOfAKind ),
-                ( CardCombination.TwoPair, IsTwoPair ),
-                ( CardCombination.Pair, IsPair )
+                IsRoyalFlash,
+                IsStraightFlash,
+                IsFourOfAKind,
+                IsFullHouse,
+                IsFlash,
+                IsStraight,
+                IsThreeOfAKind,
+                IsTwoPair,
+                IsPair,
+                IsHighCard
             };
-        }
 
-        public static bool IsQuadsOrSetOrPair(List<Card> cards, int count)
-        {
-            return cards
-                .GroupBy(card => card.Rank)
-                .Any(group => group.Count() == count);
-        }
-
-        public static bool IsPair(List<Card> cards) => IsQuadsOrSetOrPair(cards, 2);
-
-        public static bool IsTwoPair(List<Card> cards)
-        {
-            return cards
-                .GroupBy(card => card.Rank)
-                .Where(group => group.Count() == 2)
-                .Count() >= 2;
-        }
-
-        public static bool IsThreeOfAKind(List<Card> cards) => IsQuadsOrSetOrPair(cards, 3);
-
-        public static bool IsStraight(List<Card> cards)
-        {
-            var uniqueRanks = cards
-                .Select(card => card.Rank)
-                .Distinct()
-                .OrderBy(rank => rank)
-                .ToList();
-            return uniqueRanks
-                .Zip(uniqueRanks.Skip(1), (first, second) => (first, second))
-                .Where(bigram => bigram.second - bigram.first == 1)
-                .Count()
-                .Equals(4);
-        }
-
-        public static bool IsFlash(List<Card> cards)
-        {
-            return cards
-                .GroupBy(card => card.Suit)
-                .Any(group => group.Count() >= 5);
-        }
-
-        public static bool IsFullHouse(List<Card> cards) => IsPair(cards) && IsThreeOfAKind(cards);
-
-        public static bool IsFourOfAKind(List<Card> cards) => IsQuadsOrSetOrPair(cards, 4);
-
-        public static bool IsStraightFlash(List<Card> cards)
-        {
-            foreach (var group in cards.GroupBy(card => card.Suit).Where(g => g.Count() >= 5))
+            foreach (var check in checks)
             {
-                if (IsStraight(group.Select(card => card).ToList()))
-                    return true;
+                if (check(cards))
+                    break;
+            }
+        }
+
+        private bool IsHighCard(List<Card> cards)
+        {
+            var res = cards.OrderByDescending(x => x.Rank).Take(5).ToList();
+            return UpdateCombination(CardCombination.HighCard, res, 5);
+        }
+
+        private bool IsPair(List<Card> cards) => IsSimpleNumeralCombination(cards, 2);
+
+        private bool IsTwoPair(List<Card> cards)
+        {
+            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
+            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
+            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
+            var res = new List<Card>();
+            foreach (var group in ranks.Where(x => x.Value.Item1 == 2).OrderBy(x => -(int)x.Key).Take(2))
+            {
+                res.Add(group.Value.Item2[0]);
+                res.Add(group.Value.Item2[1]);
+            }
+            if (res.Count != 4)
+                return false;
+
+            res.Add(sorted.Where(x => !res.Contains(x)).FirstOrDefault());
+
+            return UpdateCombination(CardCombination.TwoPair, res, 4);
+        }
+
+        private bool IsThreeOfAKind(List<Card> cards) => IsSimpleNumeralCombination(cards, 3);
+
+        private bool IsStraight(List<Card> cards)
+        {
+            var sorted = cards.OrderByDescending(x => x.Rank).ToList();
+            bool aceFlag = sorted[0].Rank == CardRank.Ace;
+            var res = new List<Card>();
+            res.Add(sorted[0]);
+            for (int i = 0; i < sorted.Count - 1; i++)
+            {
+                if (res.Count == 5)
+                    break;
+                if (sorted[i].Rank == sorted[i + 1].Rank + 1)
+                {
+                    res.Add(sorted[i + 1]);
+                }
+                else if (sorted[i].Rank == sorted[i + 1].Rank)
+                {
+                    continue;
+                }
+                else
+                {
+                    res.Clear();
+                    res.Add(sorted[i + 1]);
+                }
+            }
+            if (res[res.Count - 1].Rank == CardRank.Two && aceFlag)
+            {
+                res.Add(sorted[0]);
+            }
+            if (res.Count == 5)
+                return UpdateCombination(CardCombination.Straight, res, 5);
+            return false;
+        }
+
+        private bool IsFlash(List<Card> cards)
+        {
+            var res = cards
+                .GroupBy(card => card.Suit)
+                .Where(group => group.Count() >= 5)
+                .SelectMany(group => group)
+                .OrderByDescending(card => card.Rank)
+                .Take(5)
+                .ToList();
+
+            if (res.Count == 5)
+                return UpdateCombination(CardCombination.Flash, res, 5);
+            return false;
+        }
+
+        private bool IsFullHouse(List<Card> cards)
+        {
+            var sorted = cards.OrderBy(x => -(int)x.Rank).ToList();
+
+            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
+            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
+            var res = new List<Card>();
+            foreach (var group in ranks.Where(x => x.Value.Item1 == 3).OrderBy(x => -(int)x.Key))
+            {
+                res.Add(group.Value.Item2[0]);
+                res.Add(group.Value.Item2[1]);
+                res.Add(group.Value.Item2[1]);
+                break;
+            }
+            if (res.Count != 3)
+                return false;
+
+            foreach (var group in ranks.Where(x => x.Value.Item1 == 2).OrderBy(x => -(int)x.Key))
+            {
+                res.Add(group.Value.Item2[0]);
+                res.Add(group.Value.Item2[1]);
+                break;
+            }
+            if (res.Count != 5)
+                return false;
+
+            return UpdateCombination(CardCombination.FullHouse, res, 5);
+        }
+
+        private bool IsFourOfAKind(List<Card> cards) => IsSimpleNumeralCombination(cards, 4);
+
+        private bool IsStraightFlash(List<Card> cards)
+        {
+            var possibleFlash = cards
+                .GroupBy(card => card.Suit)
+                .Where(g => g.Count() >= 5)
+                .SelectMany(group => group)
+                .ToList();
+            if (possibleFlash.Count > 0 && IsStraight(possibleFlash))
+            {
+                CardCombination = CardCombination.StraightFlash;
+                return true;
             }
             return false;
         }
 
-
-        public static bool IsRoyalFlash(List<Card> cards)
+        private bool IsRoyalFlash(List<Card> cards)
         {
-            return cards
-                .GroupBy(card => card.Suit)
-                .Where(group => group.Count() >= 5)
-                .SelectMany(group => group)
-                .Select(card => card.Rank)
-                .OrderByDescending(rank => rank)
-                .Take(5)
-                .SequenceEqual(new[] { CardRank.Ace, CardRank.King, CardRank.Queen, CardRank.Jack, CardRank.Ten });
+            if (IsStraightFlash(cards) && HandRank[0].Rank == CardRank.Ace)
+            {
+                CardCombination = CardCombination.RoyalFlash;
+                return true;
+            }
+            return false;
+        }        
+
+        private bool UpdateCombination(CardCombination cardCombination,
+            List<Card> cards, int handRankCardsCount)
+        {
+            CardCombination = cardCombination;
+            HandRank = cards.Take(handRankCardsCount).ToList();
+            Kickers = cards.Skip(handRankCardsCount).ToList();
+            return true;
+        }
+
+        private bool IsSimpleNumeralCombination(List<Card> cards, int number)
+        {
+            if (number < 2 || number > 4)
+                throw new ArgumentException();
+
+            var sorted = cards.OrderByDescending(x => x.Rank).ToList();
+            var ranks = new Dictionary<CardRank, Tuple<int, List<Card>>>();
+            cards.GroupBy(x => x.Rank).SelectMany(x => { ranks[x.Key] = Tuple.Create(x.Count(), x.ToList()); return x; }).ToList();
+            foreach (var key in ranks.Keys)
+            {
+                if (ranks[key].Item1 == number)
+                {
+                    var res = ranks[key].Item2;
+                    foreach (var card in sorted)
+                    {
+                        if (card.Rank != res[0].Rank)
+                        {
+                            res.Add(card);
+                            if (res.Count == 5)
+                                break;
+                        }
+                    }
+
+                    CardCombination = number == 2
+                        ? CardCombination.Pair
+                        : number == 3
+                            ? CardCombination.ThreeOfAKind
+                            : CardCombination.FourOfAKind;
+                    HandRank = res.Take(number).ToList();
+                    Kickers = res.Skip(number).ToList();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj == null)
+                throw new ArgumentException();
+
+            var otherCombination = obj as Combination;
+            if (otherCombination == null)
+                throw new ArgumentException();
+
+            Func<List<Card>, List<Card>, int> listComparer = (list1, list2) =>
+            {
+                for (int i = 0; i < list1.Count; i++)
+                {
+                    var cmp = list1[i].CompareTo(list2[i]);
+                    if (cmp != 0)
+                        return cmp;
+                }
+                return 0;
+            };
+            var compareResult = CardCombination.CompareTo(otherCombination.CardCombination);
+            if (compareResult == 0)
+                compareResult = listComparer(HandRank, otherCombination.HandRank);
+            if (compareResult == 0)
+                compareResult = listComparer(Kickers, otherCombination.Kickers);
+            return compareResult;
         }
     }
 }
