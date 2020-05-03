@@ -299,7 +299,7 @@ namespace Client
                 Controls.Add(MenuTable);
             };
 
-            CreateGameButton.Click += (sender, args) =>
+            CreateGame.Click += (sender, args) =>
             {
                 Controls.Remove(CreateGameTable);
                 Controls.Add(GameTable);
