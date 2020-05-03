@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
 using ContractStorage;
+using System.Windows.Forms;
 
 namespace Client
 {
@@ -21,6 +22,8 @@ namespace Client
             // Завершение
             Console.WriteLine("Press <Any Key> to finish Client");
             Console.ReadKey();
+
+            Application.Run(new ClientForm());
         }
 
         public static void Connect(string address) {

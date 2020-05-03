@@ -84,7 +84,7 @@ namespace Client
 
         Label InputGameIdDescriptor = new Label()
         {
-            Text = "Back to Menu",
+            Text = "Input game id to join",
             Dock = DockStyle.Fill,
             TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         };
@@ -104,7 +104,8 @@ namespace Client
             AcceptsTab = true,
             WordWrap = true,
             Text = "",
-            Dock = DockStyle.Fill
+            Dock = DockStyle.Fill,
+            ReadOnly = true
         };
 
 
@@ -185,13 +186,13 @@ namespace Client
 
         Button FoldButton = new Button
         {
-            Text = "Call",
+            Text = "Fold",
             Dock = DockStyle.Fill
         };
 
         Button RaiseButton = new Button
         {
-            Text = "Call",
+            Text = "Raise",
             Dock = DockStyle.Fill
         };
 
@@ -203,7 +204,8 @@ namespace Client
             AcceptsTab = true,
             WordWrap = true,
             Text = "",
-            Dock = DockStyle.Fill
+            Dock = DockStyle.Fill,
+            ReadOnly = true
         };
 
         TextBox ChatMessageInput = new TextBox()
@@ -263,8 +265,8 @@ namespace Client
 
 
 
-            //Controls.Add(MenuTable);
-            Controls.Add(OptionsTable);
+            Controls.Add(MenuTable);
+            //Controls.Add(OptionsTable);
         }
 
         private void SetGameHandlers()
@@ -503,11 +505,11 @@ namespace Client
 
             ChooseGameTable.Controls.Add(new Panel(), 0, 0);
             ChooseGameTable.Controls.Add(new Panel(), 1, 0);
-            ChooseGameTable.Controls.Add(new Panel(), 2, 0);
+            ChooseGameTable.Controls.Add(InputGameIdDescriptor, 2, 0);
 
             ChooseGameTable.Controls.Add(BackToMenuDescriptor, 0, 1);
             ChooseGameTable.Controls.Add(ChooseGameTitle, 1, 1);
-            ChooseGameTable.Controls.Add(InputGameIdDescriptor, 2, 1);
+            ChooseGameTable.Controls.Add(InputGameID, 2, 1);
 
             ChooseGameTable.Controls.Add(BackToMenuFromChooseGameButton, 0, 2);
             ChooseGameTable.Controls.Add(new Panel(), 1, 2);
