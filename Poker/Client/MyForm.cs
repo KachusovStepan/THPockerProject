@@ -54,7 +54,7 @@ namespace Client
 
 
         // ChooseGameTable Buttons
-        Button BackToMenuButton = new Button
+        Button BackToMenuFromChooseGameButton = new Button
         {
             Text = "Back",
             Dock = DockStyle.Fill
@@ -130,6 +130,107 @@ namespace Client
         };
 
 
+        // InitializeCreateTable Buttons  -------------------------------------------
+        Button BackToMenuFromCreateGameButton = new Button
+        {
+            Text = "Back",
+            Dock = DockStyle.Fill
+        };
+
+        Button CreateGame = new Button
+        {
+            Text = "Create",
+            Dock = DockStyle.Fill
+        };
+
+        Label EnterMinFeeLabel = new Label()
+        {
+            Text = "Enter Min Fee",
+            Dock = DockStyle.Fill,
+            TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        };
+
+        TextBox MinFeeInput = new TextBox()
+        {
+            Text = "2",
+            Dock = DockStyle.Fill
+        };
+
+        Label CreateGameLabel = new Label()
+        {
+            Text = "Create Game",
+            Dock = DockStyle.Fill,
+            TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        };
+
+
+        // Game Buttons
+        Button LeaveGameButton = new Button
+        {
+            Text = "Leave The Game",
+            Dock = DockStyle.Fill
+        };
+
+        Button BetButton = new Button
+        {
+            Text = "Bet",
+            Dock = DockStyle.Fill
+        };
+
+        Button CallButton = new Button
+        {
+            Text = "Call",
+            Dock = DockStyle.Fill
+        };
+
+        Button FoldButton = new Button
+        {
+            Text = "Call",
+            Dock = DockStyle.Fill
+        };
+
+        Button RaiseButton = new Button
+        {
+            Text = "Call",
+            Dock = DockStyle.Fill
+        };
+
+        TextBox GameChatBox = new TextBox()
+        {
+            Multiline = true,
+            ScrollBars = ScrollBars.Vertical,
+            AcceptsReturn = true,
+            AcceptsTab = true,
+            WordWrap = true,
+            Text = "",
+            Dock = DockStyle.Fill
+        };
+
+        TextBox ChatMessageInput = new TextBox()
+        {
+            Text = "",
+            Dock = DockStyle.Fill
+        };
+
+        Button SendButton = new Button
+        {
+            Text = "Send",
+            Dock = DockStyle.Fill
+        };
+
+        Label GameIdLabel = new Label()
+        {
+            Text = "GameId: - - - ",
+            Dock = DockStyle.Fill,
+            TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        };
+
+        Button BackToMenuFromOptionsButton = new Button
+        {
+            Text = "Back",
+            Dock = DockStyle.Fill
+        };
+
         public ClientForm()
         {
             ClientSize = new Size(600, 600);
@@ -139,9 +240,21 @@ namespace Client
             InitializeChooseGameTable();
             // Game Options Table Lining
             InitializeOptionsTable();
+            // Game Creation Table Lining
+            InitializeCreateTable();
+            // Game Table Lining
+            InitializeGameTable();
             // Привзяка обработчиков и тд
 
+            SetMenuButtonHandlers();
 
+            SetOptionsHandlers();
+
+            SetCreateHandlers();
+
+            SetChooseHandlers();
+
+            SetGameHandlers();
 
 
 
@@ -152,6 +265,191 @@ namespace Client
 
             //Controls.Add(MenuTable);
             Controls.Add(OptionsTable);
+        }
+
+        private void SetGameHandlers()
+        {
+            LeaveGameButton.Click += (sender, args) =>
+            {
+                Controls.Remove(GameTable);
+                Controls.Add(MenuTable);
+            };
+        }
+
+        private void SetChooseHandlers()
+        {
+            BackToMenuFromChooseGameButton.Click += (sender, args) =>
+            {
+                Controls.Remove(ChooseGameTable);
+                Controls.Add(MenuTable);
+            };
+
+            JoinButton.Click += (sender, args) =>
+            {
+                Controls.Remove(ChooseGameTable);
+                Controls.Add(GameTable);
+            };
+        }
+
+        private void SetCreateHandlers()
+        {
+            BackToMenuFromCreateGameButton.Click += (sender, args) =>
+            {
+                Controls.Remove(CreateGameTable);
+                Controls.Add(MenuTable);
+            };
+
+            CreateGameButton.Click += (sender, args) =>
+            {
+                Controls.Remove(CreateGameTable);
+                Controls.Add(GameTable);
+            };
+        }
+
+        private void SetOptionsHandlers()
+        {
+            BackToMenuFromOptionsButton.Click += (sender, args) =>
+            {
+                Controls.Remove(OptionsTable);
+                Controls.Add(MenuTable);
+            };
+        }
+
+
+        private void SetMenuButtonHandlers()
+        {
+            CreateGameButton.Click += (sender, args) =>
+            {
+                Controls.Remove(MenuTable);
+                Controls.Add(CreateGameTable);
+            };
+
+            ChooseGameButton.Click += (sender, args) =>
+            {
+                Controls.Remove(MenuTable);
+                Controls.Add(ChooseGameTable);
+            };
+
+            OptionsButton.Click += (sender, args) =>
+            {
+                Controls.Remove(MenuTable);
+                Controls.Add(OptionsTable);
+            };
+        }
+
+        private void InitializeGameTable()
+        {
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Sky
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Image
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Moves
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Moves
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Basement
+
+
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Left
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Bet Call
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Fold Raise
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40)); // Chat
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Smf
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Right
+
+            GameTable.Dock = DockStyle.Fill;
+
+            GameTable.Controls.Add(LeaveGameButton, 0, 0);
+            GameTable.Controls.Add(new Panel(), 1, 0);
+            GameTable.Controls.Add(new Panel(), 2, 0);
+            GameTable.Controls.Add(GameIdLabel, 3, 0);
+            GameTable.Controls.Add(new Panel(), 4, 0);
+            GameTable.Controls.Add(new Panel(), 5, 0);
+
+            GameTable.Controls.Add(new Panel(), 0, 1);
+            GameTable.Controls.Add(new Panel(), 1, 1);
+            GameTable.Controls.Add(new Panel(), 2, 1);
+            GameTable.Controls.Add(new Panel(), 3, 1);
+            GameTable.Controls.Add(new Panel(), 4, 1);
+            GameTable.Controls.Add(new Panel(), 5, 1);
+
+            GameTable.Controls.Add(new Panel(), 0, 2);
+            GameTable.Controls.Add(new Panel(), 1, 2);
+            GameTable.Controls.Add(new Panel(), 2, 2);
+            GameTable.Controls.Add(new Panel(), 3, 2);
+            GameTable.Controls.Add(new Panel(), 4, 2);
+            GameTable.Controls.Add(new Panel(), 5, 2);
+
+            GameTable.Controls.Add(new Panel(), 0, 3);
+            GameTable.Controls.Add(new Panel(), 1, 3);
+            GameTable.Controls.Add(new Panel(), 2, 3);
+            GameTable.Controls.Add(new Panel(), 3, 3);
+            GameTable.Controls.Add(new Panel(), 4, 3);
+            GameTable.Controls.Add(new Panel(), 5, 3);
+
+            GameTable.Controls.Add(new Panel(), 0, 4);
+            GameTable.Controls.Add(BetButton, 1, 4);
+            GameTable.Controls.Add(CallButton, 2, 4);
+            GameTable.Controls.Add(new Panel(), 3, 4);
+            GameTable.Controls.Add(ChatMessageInput, 4, 4);
+            GameTable.Controls.Add(new Panel(), 5, 4);
+
+            GameTable.Controls.Add(new Panel(), 0, 5);
+            GameTable.Controls.Add(RaiseButton, 1, 5);
+            GameTable.Controls.Add(FoldButton, 2, 5);
+            GameTable.Controls.Add(GameChatBox, 3, 5);
+            GameTable.Controls.Add(SendButton, 4, 5);
+            GameTable.Controls.Add(new Panel(), 5, 5);
+
+            GameTable.Controls.Add(new Panel(), 0, 6);
+            GameTable.Controls.Add(new Panel(), 1, 6);
+            GameTable.Controls.Add(new Panel(), 2, 6);
+            GameTable.Controls.Add(new Panel(), 3, 6);
+            GameTable.Controls.Add(new Panel(), 4, 6);
+            GameTable.Controls.Add(new Panel(), 5, 6);
+        }
+
+        private void InitializeCreateTable()
+        {
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Sky
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Image
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Min Fee
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Input
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Start
+            CreateGameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Basement
+
+            CreateGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Left Button "Back"
+            CreateGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80)); // Main
+            CreateGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Right
+
+            CreateGameTable.Dock = DockStyle.Fill;
+
+            CreateGameTable.Controls.Add(BackToMenuFromCreateGameButton, 0, 0);
+            CreateGameTable.Controls.Add(new Panel(), 1, 0);
+            CreateGameTable.Controls.Add(new Panel(), 2, 0);
+
+            CreateGameTable.Controls.Add(new Panel(), 0, 1);
+            CreateGameTable.Controls.Add(CreateGameLabel, 1, 1);
+            CreateGameTable.Controls.Add(new Panel(), 2, 1);
+
+            CreateGameTable.Controls.Add(new Panel(), 0, 2);
+            CreateGameTable.Controls.Add(new Panel(), 1, 2);
+            CreateGameTable.Controls.Add(new Panel(), 2, 2);
+
+            CreateGameTable.Controls.Add(new Panel(), 0, 3);
+            CreateGameTable.Controls.Add(EnterMinFeeLabel, 1, 3);
+            CreateGameTable.Controls.Add(new Panel(), 2, 3);
+
+            CreateGameTable.Controls.Add(new Panel(), 0, 4);
+            CreateGameTable.Controls.Add(MinFeeInput, 1, 4);
+            CreateGameTable.Controls.Add(new Panel(), 2, 4);
+
+            CreateGameTable.Controls.Add(new Panel(), 0, 5);
+            CreateGameTable.Controls.Add(CreateGame, 1, 5);
+            CreateGameTable.Controls.Add(new Panel(), 2, 5);
+
+            CreateGameTable.Controls.Add(new Panel(), 0, 6);
+            CreateGameTable.Controls.Add(new Panel(), 1, 6);
+            CreateGameTable.Controls.Add(new Panel(), 2, 6);
         }
 
         private void InitializeOptionsTable()
@@ -168,7 +466,7 @@ namespace Client
 
             OptionsTable.Dock = DockStyle.Fill;
 
-            OptionsTable.Controls.Add(BackToMenuButton, 0, 0);
+            OptionsTable.Controls.Add(BackToMenuFromOptionsButton, 0, 0);
             OptionsTable.Controls.Add(new Panel(), 1, 0);
             OptionsTable.Controls.Add(new Panel(), 2, 0);
 
@@ -211,7 +509,7 @@ namespace Client
             ChooseGameTable.Controls.Add(ChooseGameTitle, 1, 1);
             ChooseGameTable.Controls.Add(InputGameIdDescriptor, 2, 1);
 
-            ChooseGameTable.Controls.Add(BackToMenuButton, 0, 2);
+            ChooseGameTable.Controls.Add(BackToMenuFromChooseGameButton, 0, 2);
             ChooseGameTable.Controls.Add(new Panel(), 1, 2);
             ChooseGameTable.Controls.Add(JoinButton, 2, 2);
 
