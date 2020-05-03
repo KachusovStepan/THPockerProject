@@ -11,25 +11,54 @@ namespace Client
     {
         GameProxy Game;
 
-        Button ChooseTable;
-        Button CreateTable;
-        Button Exit;
+        Button ChooseTable = new Button
+        {
+            Text = "Choose a Table"
+        };
+        Button CreateTable = new Button
+        {
+            Text = "Create a Table"
+        };
+        Button Exit = new Button
+        {
+            Text = "Exit"
+        };
         Button Options;
 
-        Button JoinButton;
-        Button BetButton;
-        Button CallButton;
-        Button RaiseButton;
-        Button FoldButton;
+        Button JoinButton = new Button
+        {
+            Text = "Join a Table"
+        };
+        Button BetButton = new Button
+        {
+            Text = "Bet"
+        };
+        Button CallButton = new Button
+        {
+            Text = "Call"
+        };
+        Button RaiseButton = new Button
+        {
+            Text = "Raise"
+        };
+        Button FoldButton = new Button
+        {
+            Text = "Fold"
+        };
 
-        Button SendMessage;
+        Button SendMessage = new Button
+        {
+            Text = "Send"
+        };
 
         TextBox SendingBox;
         TextBox ChatBox;
 
-        Button Send;
+        Button LeaveButton = new Button
+        {
+            Text = "Leave the Table"
+        };
 
-        Button LeaveButton;
         public ClientForm(GameProxy game) {
             Game = game;
             BindButtons();
