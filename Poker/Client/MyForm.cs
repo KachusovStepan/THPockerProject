@@ -12,7 +12,7 @@ namespace Client
     public partial class ClientForm : Form
     {
         GameProxy Game;
-
+        SyncTimer STimer;
         // Таблицы
         TableLayoutPanel MenuTable = new TableLayoutPanel();
         TableLayoutPanel ChooseGameTable = new TableLayoutPanel();
@@ -25,7 +25,11 @@ namespace Client
         TableLayoutPanel ChatTable = new TableLayoutPanel();
 
         Thread TimerThread;
-        
+
+        Action<int> ChangeChat;
+        Action<int> ChangeStartedGamesBox;
+
+
 
         public ClientForm(GameProxy game)
         {
@@ -58,7 +62,7 @@ namespace Client
             // Запуск таймера
 
             // Делегат для обновления чата
-            Action<int> changeChat = (int t) => {
+            ChangeChat = (int t) => {
                 var success = Game.UpdateRegularData();
                 if (!success) {
                     return;
@@ -72,14 +76,27 @@ namespace Client
                 }
             };
 
+            // Делегат для обновления запущенных игр
+            ChangeStartedGamesBox = (int t) =>
+            {
+                var success = Game.GetExistingGamesWithPlayerCount();
+                if (!success)
+                    return;
+                var builder = new StringBuilder();
+                foreach (var key in Game.GamePlayerCountDict.Keys) {
+                    builder.Append("Game ID: {0}; Player Count: {1}\r\n", key, Game.GamePlayerCountDict[key]);
+                }
+                this.StartedGames.Text = builder.ToString();
+            };
+
             // Таймер может лечь при переполнении, но можно пока оставить
-            var timer = new SyncTimer();
-            timer.Interval = 500;
-            timer.Tick += changeChat;
+            STimer = new SyncTimer();
+            STimer.Interval = 500;
+            //STimer.Tick += changeChat;
 
             var thR = new Thread(() =>
             {
-                timer.Start();
+                STimer.Start();
             });
             
             // Запуск потока с таймера

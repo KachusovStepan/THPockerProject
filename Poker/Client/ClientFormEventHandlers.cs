@@ -19,7 +19,7 @@ namespace Client
                 var success = Game.LeaveTheGame();
                 if (!success)
                     return;
-
+                this.STimer.Tick -= ChangeChat;
                 Console.WriteLine("Leaved");
 
                 Controls.Remove(GameTable);
@@ -142,9 +142,12 @@ namespace Client
             {
                 Console.WriteLine("- <Back Buttom> -");
 
+                this.STimer.Tick -= ChangeStartedGamesBox;
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(MenuTable);
             };
+
+            
 
             // 1) Парс текста
             // 3) Установка имен участников
@@ -176,7 +179,7 @@ namespace Client
                     return;
                 Game.CurrentGameId = targetId;
                 Console.WriteLine("Joined the game {0}", targetId);
-
+                this.GameIdLabel.Text = String.Format("Game ID: {0}", targetId.ToString());
                 // 5) Переключение таблиц
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(GameTable);
@@ -224,6 +227,8 @@ namespace Client
                 if (!success)
                     return;
                 Console.WriteLine("Joined");
+                this.GameIdLabel.Text = String.Format("Game ID: {0}", targetId.ToString());
+                this.STimer.Tick += ChangeChat;
                 // 5) Переключение таблиц
                 Controls.Remove(CreateGameTable);
                 Controls.Add(GameTable);
@@ -261,6 +266,7 @@ namespace Client
             // Просто переход в новуб таблицу
             ChooseGameButton.Click += (sender, args) =>
             {
+                this.STimer.Tick += ChangeStartedGamesBox;
                 Controls.Remove(MenuTable);
                 Controls.Add(ChooseGameTable);
             };
