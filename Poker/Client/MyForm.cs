@@ -49,6 +49,7 @@ namespace Client
             InitializeGameTable();
             // Привзяка обработчиков и тд
 
+
             SetMenuButtonHandlers();
 
             SetOptionsHandlers();
@@ -58,8 +59,6 @@ namespace Client
             SetChooseHandlers();
 
             SetGameHandlers();
-
-            // Запуск таймера
 
             // Делегат для обновления чата
             ChangeChat = (int t) => {
@@ -76,6 +75,7 @@ namespace Client
                 }
             };
 
+
             // Делегат для обновления запущенных игр
             ChangeStartedGamesBox = (int t) =>
             {
@@ -84,15 +84,15 @@ namespace Client
                     return;
                 var builder = new StringBuilder();
                 foreach (var key in Game.GamePlayerCountDict.Keys) {
-                    builder.Append("Game ID: {0}; Player Count: {1}\r\n", key, Game.GamePlayerCountDict[key]);
+                    builder.Append(String.Format("Game ID: {0}; Player Count: {1}\r\n", key, Game.GamePlayerCountDict[key]));
                 }
                 this.StartedGames.Text = builder.ToString();
             };
 
+
             // Таймер может лечь при переполнении, но можно пока оставить
             STimer = new SyncTimer();
             STimer.Interval = 500;
-            //STimer.Tick += changeChat;
 
             var thR = new Thread(() =>
             {
