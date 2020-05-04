@@ -19,6 +19,10 @@ namespace Client
         TableLayoutPanel OptionsTable = new TableLayoutPanel();
         TableLayoutPanel GameTable = new TableLayoutPanel();
 
+        TableLayoutPanel MovesChatTable = new TableLayoutPanel();
+        TableLayoutPanel MovesTable = new TableLayoutPanel();
+        TableLayoutPanel ChatTable = new TableLayoutPanel();
+
         // MenuTable Buttons
         Button ChooseGameButton = new Button
         {
@@ -178,6 +182,12 @@ namespace Client
             Dock = DockStyle.Fill
         };
 
+        TextBox BetInputBox = new TextBox
+        {
+            Text = "",
+            Dock = DockStyle.Fill
+        };
+
         Button CallButton = new Button
         {
             Text = "Call",
@@ -193,6 +203,12 @@ namespace Client
         Button RaiseButton = new Button
         {
             Text = "Raise",
+            Dock = DockStyle.Fill
+        };
+
+        Button CheckButton = new Button
+        {
+            Text = "Check",
             Dock = DockStyle.Fill
         };
 
@@ -259,10 +275,9 @@ namespace Client
             SetGameHandlers();
 
 
-
-
-
-
+            // Рисовать стол
+            // OnPaint
+            // Invalidate ...
 
 
             Controls.Add(MenuTable);
@@ -344,69 +359,95 @@ namespace Client
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Sky
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Image
-            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
-            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Moves
-            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Moves
-            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Basement
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 5)); // Title
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20)); // Moves Chat
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 5)); // Basement
 
 
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Left
-            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Bet Call
-            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Fold Raise
-            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40)); // Chat
-            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Smf
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80)); // Moves Chat
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Right
 
             GameTable.Dock = DockStyle.Fill;
 
+            // Sky
             GameTable.Controls.Add(LeaveGameButton, 0, 0);
             GameTable.Controls.Add(new Panel(), 1, 0);
-            GameTable.Controls.Add(new Panel(), 2, 0);
-            GameTable.Controls.Add(GameIdLabel, 3, 0);
-            GameTable.Controls.Add(new Panel(), 4, 0);
-            GameTable.Controls.Add(new Panel(), 5, 0);
+            GameTable.Controls.Add(GameIdLabel, 2, 0);
 
+            // Title
             GameTable.Controls.Add(new Panel(), 0, 1);
             GameTable.Controls.Add(new Panel(), 1, 1);
             GameTable.Controls.Add(new Panel(), 2, 1);
-            GameTable.Controls.Add(new Panel(), 3, 1);
-            GameTable.Controls.Add(new Panel(), 4, 1);
-            GameTable.Controls.Add(new Panel(), 5, 1);
 
-            GameTable.Controls.Add(new Panel(), 0, 2);
-            GameTable.Controls.Add(new Panel(), 1, 2);
-            GameTable.Controls.Add(new Panel(), 2, 2);
-            GameTable.Controls.Add(new Panel(), 3, 2);
-            GameTable.Controls.Add(new Panel(), 4, 2);
-            GameTable.Controls.Add(new Panel(), 5, 2);
+            // Poker Table (image-graphics)
+            GameTable.Controls.Add(new Panel(), 0, 2); // Left
+            GameTable.Controls.Add(new Panel(), 1, 2); // Poker Table
+            GameTable.Controls.Add(new Panel(), 2, 2); // Right
 
+            // Title
             GameTable.Controls.Add(new Panel(), 0, 3);
             GameTable.Controls.Add(new Panel(), 1, 3);
             GameTable.Controls.Add(new Panel(), 2, 3);
-            GameTable.Controls.Add(new Panel(), 3, 3);
-            GameTable.Controls.Add(new Panel(), 4, 3);
-            GameTable.Controls.Add(new Panel(), 5, 3);
 
-            GameTable.Controls.Add(new Panel(), 0, 4);
-            GameTable.Controls.Add(BetButton, 1, 4);
-            GameTable.Controls.Add(CallButton, 2, 4);
-            GameTable.Controls.Add(new Panel(), 3, 4);
-            GameTable.Controls.Add(ChatMessageInput, 4, 4);
-            GameTable.Controls.Add(new Panel(), 5, 4);
+            // Controls
+            //GameTable.Controls.Add(new Panel(), 0, 4);
+            //GameTable.Controls.Add(BetButton, 1, 4);
+            //GameTable.Controls.Add(CallButton, 2, 4);
+            //GameTable.Controls.Add(new Panel(), 3, 4);
+            //GameTable.Controls.Add(ChatMessageInput, 4, 4);
+            //GameTable.Controls.Add(new Panel(), 5, 4);
+            //
+            MovesChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            MovesChatTable.Dock = DockStyle.Fill;
+            GameTable.Controls.Add(MovesChatTable, 1, 4);
+
+
+            // --------------------------------- MOVES -------------------------------------
+            MovesTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Call Check BetInput
+            MovesTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Raise Fold Bet
+
+            MovesTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33)); // Call Raise
+            MovesTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33)); // Check Fold
+            MovesTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34)); // BetInput Bet
+
+            MovesTable.Controls.Add(CallButton, 0, 0);
+            MovesTable.Controls.Add(CheckButton, 1, 0);
+            MovesTable.Controls.Add(BetInputBox, 2, 0);
+
+            MovesTable.Controls.Add(RaiseButton, 0, 1);
+            MovesTable.Controls.Add(FoldButton, 1, 1);
+            MovesTable.Controls.Add(BetButton, 2, 1);
+
+            MovesTable.Dock = DockStyle.Fill;
+
+            MovesChatTable.Controls.Add(MovesTable, 0, 0);
+
+            // ---------------------------------- /MOVES -------------------------------------
+
+
+            // --------------------------------- ChatBox -------------------------------------
+
+            ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 60));
+            ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+            ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+            ChatTable.Controls.Add(GameChatBox, 0, 0);
+            ChatTable.Controls.Add(ChatMessageInput, 0, 1);
+            ChatTable.Controls.Add(SendButton, 0, 2);
+
+            ChatTable.Dock = DockStyle.Fill;
+            MovesChatTable.Controls.Add(ChatTable, 1, 0);
+
+
+            // ---------------------------------- /ChatBox -------------------------------------
+
+
 
             GameTable.Controls.Add(new Panel(), 0, 5);
-            GameTable.Controls.Add(RaiseButton, 1, 5);
-            GameTable.Controls.Add(FoldButton, 2, 5);
-            GameTable.Controls.Add(GameChatBox, 3, 5);
-            GameTable.Controls.Add(SendButton, 4, 5);
-            GameTable.Controls.Add(new Panel(), 5, 5);
-
-            GameTable.Controls.Add(new Panel(), 0, 6);
-            GameTable.Controls.Add(new Panel(), 1, 6);
-            GameTable.Controls.Add(new Panel(), 2, 6);
-            GameTable.Controls.Add(new Panel(), 3, 6);
-            GameTable.Controls.Add(new Panel(), 4, 6);
-            GameTable.Controls.Add(new Panel(), 5, 6);
+            GameTable.Controls.Add(new Panel(), 1, 5);
+            GameTable.Controls.Add(new Panel(), 2, 5);
         }
 
         private void InitializeCreateTable()
