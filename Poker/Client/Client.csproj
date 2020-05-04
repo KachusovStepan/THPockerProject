@@ -47,6 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientFormControls.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientFormEventHandlers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientFormTableInitialization.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Frames.cs" />
     <Compile Include="GameProxy.cs" />
     <Compile Include="MyForm.cs">
