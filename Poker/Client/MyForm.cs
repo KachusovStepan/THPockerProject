@@ -29,8 +29,6 @@ namespace Client
         Action<int> ChangeChat;
         Action<int> ChangeStartedGamesBox;
 
-
-
         public ClientForm(GameProxy game)
         {
             Game = game;

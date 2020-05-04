@@ -180,6 +180,9 @@ namespace Client
                 Game.CurrentGameId = targetId;
                 Console.WriteLine("Joined the game {0}", targetId);
                 this.GameIdLabel.Text = String.Format("Game ID: {0}", targetId.ToString());
+
+                this.STimer.Tick -= ChangeStartedGamesBox;
+                this.STimer.Tick += ChangeChat;
                 // 5) Переключение таблиц
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(GameTable);
