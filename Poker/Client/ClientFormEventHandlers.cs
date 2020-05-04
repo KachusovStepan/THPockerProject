@@ -26,6 +26,9 @@ namespace Client
                 Controls.Add(MenuTable);
             };
             
+            // 1) Получение сообщения из поля ввода
+            // 2) Отправка сообщения
+            // 3) Стирание сообщения из поля ввода
             SendButton.Click += (sender, args) =>
             {
                 Console.WriteLine("- <Send Buttom> -");
@@ -43,6 +46,94 @@ namespace Client
 
                 Console.WriteLine("Sent message \"{0}\"", message);
             };
+
+
+            // ----------------------------- MOVES -------------------------------
+
+            // 1) Парс текста
+            // 2) Попытка сделать ход
+            BetButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("* <Bet Buttom> *");
+
+                var playerBetString = this.BetInputBox.Text;
+                // 1) Парс текста
+                var success = int.TryParse(playerBetString, out int bet);
+                if (!success) {
+                    return;
+                }
+
+                if (bet < 2) {
+                    return;
+                } 
+
+                success = Game.MakeBet(bet);
+                if (!success) {
+                    Console.WriteLine("Fail to Make Bet");
+                    return;
+                }
+
+                this.BetInputBox.Text = "";
+            };
+
+            // 1) Попытка сделать ход
+            CallButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("* <Call Buttom> *");
+                var success = Game.MakeCall();
+                if (!success)
+                {
+                    Console.WriteLine("Fail to Make Call");
+                    return;
+                }
+            };
+
+            // 1) Попытка сделать ход
+            RaiseButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("* <Raise Buttom> *");
+
+                var playerBetString = this.BetInputBox.Text;
+                // 1) Парс текста
+                var success = int.TryParse(playerBetString, out int bet);
+                if (!success)
+                {
+                    return;
+                }
+
+                success = Game.MakeRaise(bet);
+                if (!success)
+                {
+                    Console.WriteLine("Fail to Make Raise");
+                    return;
+                }
+
+                this.BetInputBox.Text = "";
+            };
+
+            // 1) Попытка сделать ход
+            CheckButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("* <Check Buttom> *");
+                var success = Game.MakeCheck();
+                if (!success)
+                {
+                    Console.WriteLine("Fail to Make Check");
+                }
+            };
+
+            // 1) Попытка сделать ход
+            FoldButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("* <Fold Buttom> *");
+                var success = Game.MakeFold();
+                if (!success)
+                {
+                    Console.WriteLine("Fail to Make Fold");
+                }
+            };
+
+            // ------------------------ /MOVES --------------------------------
         }
 
         private void SetChooseHandlers()
@@ -73,7 +164,7 @@ namespace Client
                 Console.WriteLine("Success parsed {0}", targetId);
 
                 // 3) Установка имен участников
-                success = Game.SetState(targetId);
+                success = Game.SetPlayerNames(targetId);
                 if (!success)
                     return;
 
@@ -127,7 +218,7 @@ namespace Client
 
                 Game.CurrentGameId = targetId;
                 // 3) Установка имен участников
-                Game.SetState(Game.CurrentGameId);
+                Game.SetPlayerNames(Game.CurrentGameId);
                 // 4) Подключение к игре
                 var success = Game.TryJoinTheGame(Game.CurrentGameId);
                 if (!success)

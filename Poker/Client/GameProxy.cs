@@ -66,7 +66,7 @@ namespace Client
             PlayerName = name;
         }
 
-        public bool SetState(int gameId) {
+        public bool SetPlayerNames(int gameId) {
             var playerNames = Proxy.CheckPlayerNames(gameId);
             
             if (playerNames is null) {
@@ -113,8 +113,13 @@ namespace Client
         public bool MakeBet(int bet)
         {
             if (CurrentState.CurrentPlayer != PlayerPosition)
+            {
+                Console.WriteLine("Fail: Not Player's turn");
                 return false;
+            }
             var successed = Proxy.DoBet(CurrentGameId, PlayerId, bet);
+            if (!successed)
+                Console.WriteLine("Fail: Server fail");
             return successed;
         }
 
@@ -123,6 +128,14 @@ namespace Client
             if (CurrentState.CurrentPlayer != PlayerPosition)
                 return false;
             var successed = Proxy.DoCall(CurrentGameId, PlayerId);
+            return successed;
+        }
+
+        public bool MakeCheck()
+        {
+            if (CurrentState.CurrentPlayer != PlayerPosition)
+                return false;
+            var successed = Proxy.DoCheck(CurrentGameId, PlayerId);
             return successed;
         }
 

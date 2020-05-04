@@ -57,6 +57,7 @@ namespace Client
 
             // Запуск таймера
 
+            // Делегат для обновления чата
             Action<int> changeChat = (int t) => {
                 var success = Game.UpdateRegularData();
                 if (!success) {
@@ -71,6 +72,7 @@ namespace Client
                 }
             };
 
+            // Таймер может лечь при переполнении, но можно пока оставить
             var timer = new SyncTimer();
             timer.Interval = 500;
             timer.Tick += changeChat;
@@ -79,9 +81,11 @@ namespace Client
             {
                 timer.Start();
             });
-
+            
+            // Запуск потока с таймера
             thR.Start();
 
+            // Чтобы корректно освободить поток с таймером перед завершением
             this.FormClosing += (sender, args) =>
             {
                 thR.Abort();
