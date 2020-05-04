@@ -52,3 +52,12 @@ D:\_учеба\progs\C#\Игра\Poker\Tests\obj\Debug\Tests.csproj.CoreCompileI
 D:\_учеба\progs\C#\Игра\Poker\Tests\obj\Debug\Tests.csproj.CopyComplete
 D:\_учеба\progs\C#\Игра\Poker\Tests\obj\Debug\Tests.dll
 D:\_учеба\progs\C#\Игра\Poker\Tests\obj\Debug\Tests.pdb
+C:\repos\THPokerProject\Poker\Tests\bin\Debug\Server.exe
+C:\repos\THPokerProject\Poker\Tests\bin\Debug\Server.pdb
+C:\repos\THPokerProject\Poker\Tests\bin\Debug\Server.exe.config
+C:\repos\THPokerProject\Poker\Tests\bin\Debug\ContractStorage.exe
+C:\repos\THPokerProject\Poker\Tests\bin\Debug\ContractStorage.pdb
+C:\repos\THPokerProject\Poker\Tests\bin\Debug\ContractStorage.exe.config
+D:\_учеба\progs\C#\Игра\Poker\Tests\bin\Debug\ContractStorage.exe
+D:\_учеба\progs\C#\Игра\Poker\Tests\bin\Debug\ContractStorage.pdb
+D:\_учеба\progs\C#\Игра\Poker\Tests\bin\Debug\ContractStorage.exe.config

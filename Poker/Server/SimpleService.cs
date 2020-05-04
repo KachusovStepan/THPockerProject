@@ -1,105 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GameLogic;
-using System.ServiceModel;
-using System.Runtime.Serialization;
+using ContractStorage;
 
 namespace Server
 {
-    [ServiceContract]
-    interface IContract
-    {
-        [OperationContract]
-        Dictionary<int, int> ShowExistingGames();
-
-        [OperationContract]
-        bool CreateNewGame(int gameId);
-
-        [OperationContract]
-        int Join(int gameId, string name, int position);
-
-        [OperationContract]
-        bool LeaveTheGame(int gameId, int playerId);
-
-        [OperationContract]
-        bool DoRaise(int gameId, int playerId, int bet);
-
-        [OperationContract]
-        bool DoCall(int gameId, int playerId);
-
-        [OperationContract]
-        bool DoFold(int gameId, int playerId);
-
-        [OperationContract]
-        bool DoCheck(int gameId, int playerId);
-
-        [OperationContract]
-        bool SendMessage(int gameId, int playerId, string msg);
-
-        [OperationContract]
-        string CheckCards(int gameId, int playerId);
-
-        [OperationContract]
-        State GetState(int gameId);
-    }
-
-
-    [DataContract(Namespace = "OtherNamespace")]
-    public class State
-    {
-        [DataMember]
-        public int PlayerCount;
-
-        [DataMember]
-        public Dictionary<int, int> Banks;
-
-        [DataMember]
-        public int TableBank;
-
-        [DataMember]
-        public Dictionary<int, string> Seats;
-
-        [DataMember]
-        public Dictionary<char, int> Roles;
-
-        [DataMember]
-        public char Round;
-
-        [DataMember]
-        public int CurrentPlayer;
-
-        public State(int playerCount, Dictionary<int, int> banks, int tableBank, Dictionary<int, string> seatNames, Dictionary<char, int> blindSeats, char currRound, int currPlayer)
-        {
-            PlayerCount = playerCount;
-            Banks = banks;
-            TableBank = tableBank;
-            Seats = seatNames;
-            Roles = blindSeats;
-            Round = currRound;
-            CurrentPlayer = currPlayer;
-        }
-    }
-
-
-    [DataContract(Namespace = "OtherNamespace")]
-    public class Point
-    {
-        [DataMember]
-        public double X;
-
-        [DataMember]
-        public double Y;
-
-        public Point(double x, double y)
-        {
-            this.X = x;
-            this.Y = y;
-        }
-    }
-
     // Service
     class MyService : IContract
     {
@@ -112,6 +17,8 @@ namespace Server
         public bool CreateNewGame(int gameId)
         {
             var successed = Game.CreateNewGame(gameId);
+            if (successed)
+                Program.GamesToStart.Enqueue(gameId);
             return successed;
         }
 
@@ -176,9 +83,15 @@ namespace Server
             return gameState;
         }
 
-        public bool DoRaise(int gameId, int playerId, int bet)
+        public bool DoBet(int gameId, int playerId, int bet)
         {
             var successed = DoPlayerBet(gameId, playerId, Bet.Bet, bet);
+            return successed;
+        }
+
+        public bool DoRaise(int gameId, int playerId, int bet)
+        {
+            var successed = DoPlayerBet(gameId, playerId, Bet.Raise, bet);
             return successed;
         }
 
@@ -202,13 +115,9 @@ namespace Server
 
         private bool DoPlayerBet(int gameId, int playerId, Bet bet, int value)
         {
-            var games = Game.ShowGames();
-            if (!games.ContainsKey(gameId) || Game.GetGameInstance(gameId).PlayerByID.ContainsKey(playerId))
-            {
+            var game = TryGetGame(gameId);
+            if (game is null)
                 return false;
-            }
-
-            var game = Game.GetGameInstance(gameId);
 
             var playerInfo = game.PlayerByID[playerId];
             if (game.CurrentPlayer != playerInfo.Position)
@@ -226,6 +135,67 @@ namespace Server
             game.PlayerBets[playerInfo.Position] = playerBet;
             game.BetHasBeenMade = true;
             return true;
+        }
+
+        public string CheckTableCards(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            var tableCards = Game.GetGameInstance(gameId).TableCards;
+            var res = String.Empty;
+            foreach (var card in tableCards) {
+                res += String.Format("{0} ", card.GetSimpleRepresentation());
+            }
+            res = res.Substring(0, res.Length - 1);
+            return res;
+        }
+
+        public char CheckRound(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return char.MinValue;
+            return game.GetRound();
+        }
+
+        public List<string> CheckPlayerNames(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            return game.ListPlayerNames();
+        }
+
+        public Dictionary<char, int> CheckRoles(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            var blindSeats = new Dictionary<char, int> { { 'd', game.DealerSeat }, { 's', game.SmallBlindSeat }, { 'b', game.BigBlindSeat } };
+            return blindSeats;
+        }
+
+        public bool[] CheckAlive(int gameId)
+        {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return null;
+
+            return game.Ready;
+        }
+
+        private Game TryGetGame(int gameId)
+        {
+            if (!Game.ListGameIds().Contains(gameId))
+            {
+                return null;
+            }
+
+            return Game.GetGameInstance(gameId);
         }
     }
 }
