@@ -24,7 +24,7 @@ namespace Client
             { 'b', TurnRole.BigBlind}
         };
         public IContract Proxy { get; private set; }
-        public int CurrentGameId { get; private set; }
+        public int CurrentGameId { get; set; }
         public Dictionary<int, int> GamePlayerCountDict;
         public string PlayerName = "Unknown";
         public int PlayerId;
@@ -66,9 +66,12 @@ namespace Client
 
         public bool SetState(int gameId) {
             var playerNames = Proxy.CheckPlayerNames(gameId);
+            
             if (playerNames is null) {
                 return false;
             }
+
+            Console.WriteLine("Got Names");
             PlayerNames = playerNames;
             return true;
         }
@@ -76,18 +79,25 @@ namespace Client
         public bool TryJoinTheGame(int gameId) {
             var position = -1;
             for (int i = 0; i < 10; i++) {
-                if (PlayerNames[i] != null) {
+                Console.WriteLine("Checked seat {0}", i);
+                if (PlayerNames[i] == null) {
                     position = i;
                     break;
-                }       
+                }
             }
+
+            
             if (position == -1)
                 return false;
+
+            Console.WriteLine("Found seat {0}", position);
 
             var playerId = Proxy.Join(gameId, PlayerName, position);
             PlayerPosition = position;
             if (playerId == -1)
                 return false;
+
+            Console.WriteLine("Got Id {0}", playerId);
             PlayerId = playerId;
             CurrentGameId = gameId;
             return true;
@@ -131,7 +141,10 @@ namespace Client
         }
 
         public bool SendMessage(string message) {
+            Console.WriteLine("Sending {0} {1} {2}", CurrentGameId, PlayerId, message);
             var successed = Proxy.SendMessage(CurrentGameId, PlayerId, message);
+            if (!successed)
+                Console.WriteLine("Failed");
             return successed;
         }
 

@@ -14,8 +14,34 @@ namespace Client
         {
             LeaveGameButton.Click += (sender, args) =>
             {
+                Console.WriteLine("- <Leave Buttom> -");
+
+                var success = Game.LeaveTheGame();
+                if (!success)
+                    return;
+
+                Console.WriteLine("Leaved");
+
                 Controls.Remove(GameTable);
                 Controls.Add(MenuTable);
+            };
+            
+            SendButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("- <Send Buttom> -");
+                var message = this.ChatMessageInput.Text;
+                if (message == "")
+                    return;
+
+                Console.WriteLine("Message {0}", message);
+                Console.WriteLine("{0} of {1}", Game.PlayerId, Game.CurrentGameId);
+                var success = Game.SendMessage(message);
+                if (!success)
+                    return;
+
+                this.ChatMessageInput.Text = "";
+
+                Console.WriteLine("Sent message \"{0}\"", message);
             };
         }
 
@@ -23,12 +49,38 @@ namespace Client
         {
             BackToMenuFromChooseGameButton.Click += (sender, args) =>
             {
+                Console.WriteLine("- <Back Buttom> -");
+
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(MenuTable);
             };
 
             JoinButton.Click += (sender, args) =>
             {
+                Console.WriteLine("- <Join Buttom> -");
+
+                var gameIdSting = this.InputGameID.Text;
+                var success = int.TryParse(gameIdSting, out int targetId);
+
+                if (!success)
+                    return;
+
+                Console.WriteLine("Success parsed {0}", targetId);
+
+                success = Game.SetState(targetId);
+                if (!success)
+                    return;
+
+                Console.WriteLine("Set state of {0}", targetId);
+
+
+                success = Game.TryJoinTheGame(targetId);
+                if (!success)
+                    return;
+                Game.CurrentGameId = targetId;
+                Console.WriteLine("Joined the game {0}", targetId);
+
+                // Попытка подключиться
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(GameTable);
             };
@@ -38,12 +90,34 @@ namespace Client
         {
             BackToMenuFromCreateGameButton.Click += (sender, args) =>
             {
+                Console.WriteLine("- <Back Buttom> -");
                 Controls.Remove(CreateGameTable);
                 Controls.Add(MenuTable);
             };
 
+            // 
             CreateGame.Click += (sender, args) =>
             {
+                Console.WriteLine("- <CreateGame Buttom> -");
+                var gameIdSting = this.MinFeeInput.Text;
+                var successed = int.TryParse(gameIdSting, out int targetId);
+
+                if (!successed)
+                    return;
+
+                Console.WriteLine("Success parsed {0}", targetId);
+                successed = Game.CreateNewGame(targetId);
+                if (!successed)
+                    return;
+
+                Console.WriteLine("Game was successfully created");
+
+                Game.CurrentGameId = targetId;
+                Game.SetState(Game.CurrentGameId);
+                var success = Game.TryJoinTheGame(Game.CurrentGameId);
+                if (!success)
+                    return;
+                Console.WriteLine("Joined");
                 Controls.Remove(CreateGameTable);
                 Controls.Add(GameTable);
             };
@@ -51,32 +125,51 @@ namespace Client
 
         private void SetOptionsHandlers()
         {
+            // Просто переход в новуб таблицу
             BackToMenuFromOptionsButton.Click += (sender, args) =>
             {
                 Controls.Remove(OptionsTable);
                 Controls.Add(MenuTable);
             };
-        }
 
+            SubmitName.Click += (sender, args) =>
+            {
+                var newPlayerName = this.InputPlayerName.Text;
+                Game.PlayerName = newPlayerName;
+                this.InputPlayerName.Text = "";
+                this.ChangeNameLabel.Text = String.Format("Your Name: {0}", newPlayerName);
+            };
+        }
 
         private void SetMenuButtonHandlers()
         {
+            // Просто переход в новуб таблицу
             CreateGameButton.Click += (sender, args) =>
             {
                 Controls.Remove(MenuTable);
                 Controls.Add(CreateGameTable);
             };
 
+            // Просто переход в новуб таблицу
             ChooseGameButton.Click += (sender, args) =>
             {
                 Controls.Remove(MenuTable);
                 Controls.Add(ChooseGameTable);
             };
 
+            // Просто переход в новуб таблицу
             OptionsButton.Click += (sender, args) =>
             {
                 Controls.Remove(MenuTable);
                 Controls.Add(OptionsTable);
+            };
+
+            // Завершение потока таймера и закрытие формы
+            ExitButton.Click += (sender, args) =>
+            {
+                if (TimerThread != null)
+                    TimerThread.Abort();
+                this.Close();
             };
         }
     }

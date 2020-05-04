@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using GameLogic;
 using ContractStorage;
+using System.ServiceModel;
 
 namespace Server
 {
     // Service
+    [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
     class MyService : IContract
     {
         public Dictionary<int, int> ShowExistingGames()
@@ -18,12 +20,16 @@ namespace Server
         {
             var successed = Game.CreateNewGame(gameId);
             if (successed)
+            {
+                Console.WriteLine("Added Game to Queue to Start");
                 Program.GamesToStart.Enqueue(gameId);
+            }
             return successed;
         }
 
         public int Join(int gameId, string name, int position)
         {
+            Console.WriteLine("Join");
             var games = Game.ShowGames();
             if (!games.ContainsKey(gameId))
             {
@@ -37,6 +43,7 @@ namespace Server
 
         public bool LeaveTheGame(int gameId, int playerId)
         {
+            Console.WriteLine("Leave");
             var games = Game.ShowGames();
             if (!games.ContainsKey(gameId))
             {
@@ -48,13 +55,25 @@ namespace Server
 
         public bool SendMessage(int gameId, int playerId, string msg)
         {
+            Console.WriteLine("Try Show Games from SendMeessage");
             var games = Game.ShowGames();
+            if (games is null)
+                Console.WriteLine("Games is NULL");
+            foreach (var key in games.Keys ) {
+                Console.WriteLine("{0} - {0}", key, games[key]);
+            }
+            Console.WriteLine("Got Games len of {0}", games.Count);
             if (!games.ContainsKey(gameId))
             {
+                Console.WriteLine("Fail send {2} to game {0}|  player {1}", gameId, playerId, msg);
                 return false;
             }
-
+            Console.WriteLine("Game is about to send {2} to game {0}|  player {1}", gameId, playerId, msg);
             var successed = Game.GetGameInstance(gameId).AddMessage(playerId, msg);
+            if (successed)
+                Console.WriteLine("Game sended {2} to game {0}|  player {1} OK", gameId, playerId, msg);
+            else
+                Console.WriteLine("Failed");
             return successed;
         }
 

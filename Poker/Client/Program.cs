@@ -23,7 +23,7 @@ namespace Client
             Console.WriteLine("Press <Any Key> to finish Client");
             Console.ReadKey();
 
-            Application.Run(new ClientForm());
+            Application.Run(new ClientForm(new GameProxy(Proxy)));
         }
 
         public static void Connect(string address) {

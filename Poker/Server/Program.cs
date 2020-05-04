@@ -13,7 +13,7 @@ namespace Server
         private static void StartServer(string address) {
             if (address[address.Length - 1] == '/')
                 address = address.Substring(0, address.Length - 1);
-            var uri = new Uri(string.Format("{0}/Service", address));
+            var uri = new Uri(string.Format("{0}/ServiceWCF", address));
             var serviceType = typeof(MyService);
             var contractType = typeof(IContract);
             serviceHost = new ServiceHost(serviceType, uri);
@@ -25,7 +25,8 @@ namespace Server
             //serviceHost.Close();
         }
 
-        static void Main(string[] args)
+        // Не работает
+        static void Main1(string[] args)
         {
             Console.Title = "Server";
             StartServer("http://localhost:8000/");
@@ -51,6 +52,18 @@ namespace Server
             serviceHost = null;
         }
 
+        static void Main(string[] args) {
+            Console.Title = "Server";
+            StartServer("http://localhost:8000/");
+
+            Console.WriteLine("Press any key to finish");
+
+            Console.WriteLine("Press any key to finish");
+            Console.ReadKey();
+            serviceHost.Close();
+        }
+
+        // Не работает
         private static Game TryGetGame(int gameId)
         {
             if (!Game.ListGameIds().Contains(gameId))

@@ -103,6 +103,7 @@ namespace Server
             TableCards = new List<Card>();
             Deck = new CardDeck();
             PlayerBets = new Dictionary<int, BetNode>();
+            chat = new List<string>();
         }
         public static Game GetGameInstance(int gameId)
         {
@@ -157,7 +158,7 @@ namespace Server
             var res = new Dictionary<int, int>();
             foreach (var gameId in GameInstances.Keys)
                 res.Add(gameId, GameInstances[gameId].PlayerBySeat.Count);
-
+            Console.WriteLine("About to show Games from ShowGames");
             return res;
         }
 
@@ -197,13 +198,22 @@ namespace Server
                 Ready[seat] = false;
                 Count--;
             }
+
+            if (PlayerByID.Count == 0)
+                Game.DeleteGame(GameId);
             return true;
         }
 
         public bool AddMessage(int playerId, string playerMessage)
         {
-            if (PlayerByID.ContainsKey(playerId))
+            Console.WriteLine("Adding message {1} of Player {0}", playerId, playerMessage);
+            if (!PlayerByID.ContainsKey(playerId))
+            {
+                Console.WriteLine("Check is failed no such Id {0}", playerId);
+                foreach (var id in PlayerByID.Keys)
+                    Console.WriteLine("id - {0}", id);
                 return false;
+            }
             var playerInfo = PlayerByID[playerId];
             var message = String.Format("[{0}]: {1}", playerInfo.Name, playerMessage);
             chat.Add(message);

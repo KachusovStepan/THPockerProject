@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Client
@@ -23,10 +24,14 @@ namespace Client
         TableLayoutPanel MovesTable = new TableLayoutPanel();
         TableLayoutPanel ChatTable = new TableLayoutPanel();
 
+        Thread TimerThread;
         
 
-        public ClientForm()
+        public ClientForm(GameProxy game)
         {
+            Game = game;
+
+
             ClientSize = new Size(600, 600);
             // Menu Table Lining
             InitializeMenu();
