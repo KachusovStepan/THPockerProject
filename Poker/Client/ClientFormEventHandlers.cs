@@ -55,11 +55,16 @@ namespace Client
                 Controls.Add(MenuTable);
             };
 
+            // 1) Парс текста
+            // 3) Установка имен участников
+            // 4) Подключение к игре
+            // 5) Переключение таблиц
             JoinButton.Click += (sender, args) =>
             {
                 Console.WriteLine("- <Join Buttom> -");
 
                 var gameIdSting = this.InputGameID.Text;
+                // 1) Парс текста
                 var success = int.TryParse(gameIdSting, out int targetId);
 
                 if (!success)
@@ -67,20 +72,21 @@ namespace Client
 
                 Console.WriteLine("Success parsed {0}", targetId);
 
+                // 3) Установка имен участников
                 success = Game.SetState(targetId);
                 if (!success)
                     return;
 
                 Console.WriteLine("Set state of {0}", targetId);
 
-
+                // 4) Подключение к игре
                 success = Game.TryJoinTheGame(targetId);
                 if (!success)
                     return;
                 Game.CurrentGameId = targetId;
                 Console.WriteLine("Joined the game {0}", targetId);
 
-                // Попытка подключиться
+                // 5) Переключение таблиц
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(GameTable);
             };
@@ -88,6 +94,7 @@ namespace Client
 
         private void SetCreateHandlers()
         {
+            // Переключение таблиц
             BackToMenuFromCreateGameButton.Click += (sender, args) =>
             {
                 Console.WriteLine("- <Back Buttom> -");
@@ -95,17 +102,23 @@ namespace Client
                 Controls.Add(MenuTable);
             };
 
-            // 
+            // 1) Парс текста
+            // 2) Cоздание игры
+            // 3) Установка имен участников
+            // 4) Подключение к игре
+            // 5) Переключение таблиц
             CreateGame.Click += (sender, args) =>
             {
                 Console.WriteLine("- <CreateGame Buttom> -");
                 var gameIdSting = this.MinFeeInput.Text;
+                // 1) Парс текста
                 var successed = int.TryParse(gameIdSting, out int targetId);
 
                 if (!successed)
                     return;
 
                 Console.WriteLine("Success parsed {0}", targetId);
+                // 2) Cоздание игры
                 successed = Game.CreateNewGame(targetId);
                 if (!successed)
                     return;
@@ -113,11 +126,14 @@ namespace Client
                 Console.WriteLine("Game was successfully created");
 
                 Game.CurrentGameId = targetId;
+                // 3) Установка имен участников
                 Game.SetState(Game.CurrentGameId);
+                // 4) Подключение к игре
                 var success = Game.TryJoinTheGame(Game.CurrentGameId);
                 if (!success)
                     return;
                 Console.WriteLine("Joined");
+                // 5) Переключение таблиц
                 Controls.Remove(CreateGameTable);
                 Controls.Add(GameTable);
             };
@@ -132,6 +148,7 @@ namespace Client
                 Controls.Add(MenuTable);
             };
 
+            // Запись в обьект инры имени игрока
             SubmitName.Click += (sender, args) =>
             {
                 var newPlayerName = this.InputPlayerName.Text;

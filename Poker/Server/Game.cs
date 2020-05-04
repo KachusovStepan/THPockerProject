@@ -232,7 +232,7 @@ namespace Server
                 seatNames.Add(seat, PlayerBySeat[seat].Name);
             }
             var blindSeats = new Dictionary<char, int> { { 'd', DealerSeat }, { 's', SmallBlindSeat }, { 'b', BigBlindSeat } };
-            var state = new State(PlayerByID.Count, banks, tableBanks, CurrentBank, CurrentPlayer);
+            var state = new State(PlayerByID.Count, banks, tableBanks, CurrentBank, CurrentPlayer, chat);
             return state;
         }
 

@@ -26,13 +26,17 @@ namespace ContractStorage
         [DataMember]
         public int CurrentPlayer;
 
-        public State(int playerCount, Dictionary<int, int> banks, Dictionary<int, int> tableBanks, int tableBank, int currPlayer)
+        [DataMember]
+        public List<string> Chat;
+
+        public State(int playerCount, Dictionary<int, int> banks, Dictionary<int, int> tableBanks, int tableBank, int currPlayer, List<string> chat)
         {
             PlayerCount = playerCount;
             Banks = banks;
             TableBank = tableBank;
             TableBanks = tableBanks;
             CurrentPlayer = currPlayer;
+            Chat = chat;
         }
     }
 }

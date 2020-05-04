@@ -55,6 +55,39 @@ namespace Client
 
             SetGameHandlers();
 
+            // Запуск таймера
+
+            Action<int> changeChat = (int t) => {
+                var success = Game.UpdateRegularData();
+                if (!success) {
+                    return;
+                }
+                for (int i = Math.Max(Game.MessagePointer, 0); i < Game.CurrentState.Chat.Count; i++)
+                {
+                    Game.MessagePointer++;
+                    if (this.GameChatBox.Text != "")
+                        this.GameChatBox.Text += "\r\n";
+                    this.GameChatBox.Text += Game.CurrentState.Chat[i];
+                }
+            };
+
+            var timer = new SyncTimer();
+            timer.Interval = 500;
+            timer.Tick += changeChat;
+
+            var thR = new Thread(() =>
+            {
+                timer.Start();
+            });
+
+            thR.Start();
+
+            this.FormClosing += (sender, args) =>
+            {
+                thR.Abort();
+            };
+
+
 
             // Рисовать стол
             // OnPaint

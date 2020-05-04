@@ -34,6 +34,7 @@ namespace Client
         public List<Card> TableCards;
         public Dictionary<TurnRole, int> RoleSeat;
         public State CurrentState;
+        public int MessagePointer;
         public GameProxy(IContract proxy) {
             Proxy = proxy;
             GamePlayerCountDict = new Dictionary<int, int>();
@@ -45,6 +46,7 @@ namespace Client
                 { TurnRole.BigBlind, -1 }
             };
             CurrentState = null;
+            MessagePointer = 0;
         }
 
         public bool GetExistingGamesWithPlayerCount() {
