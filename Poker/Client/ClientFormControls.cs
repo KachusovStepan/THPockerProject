@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Client
 {
@@ -234,6 +235,99 @@ namespace Client
         {
             Text = "Back",
             Dock = DockStyle.Fill
+        };
+
+
+        // --------------------------------------------------------- TableCards ---------------------------------------
+        static PictureBox TableCard1 = new PictureBox()
+        {
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            //Image = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\2c.png")),
+            Dock = DockStyle.Fill
+            //BackColor = Color.FromArgb(100, 88, 44, 55)
+        };
+
+        static PictureBox TableCard2 = new PictureBox()
+        {
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            //Image = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\2d.png")),
+            Dock = DockStyle.Fill
+            //BackColor = Color.FromArgb(100, 88, 44, 55)
+        };
+
+        static PictureBox TableCard3 = new PictureBox()
+        {
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            //Image = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\2h.png")),
+            Dock = DockStyle.Fill
+            //BackColor = Color.FromArgb(100, 88, 44, 55)
+        };
+
+        static PictureBox TableCard4 = new PictureBox()
+        {
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            //Image = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\2s.png")),
+            Dock = DockStyle.Fill
+            //BackColor = Color.FromArgb(100, 88, 44, 55)
+        };
+
+        static PictureBox TableCard5 = new PictureBox()
+        {
+            SizeMode = PictureBoxSizeMode.StretchImage,
+            //Image = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\3c.png")),
+            Dock = DockStyle.Fill
+            //BackColor = Color.FromArgb(100, 88, 44, 55)
+        };
+
+        // ---------------------------------------------- Player Profile Labels
+        static Label PlayerProfileLabel1 = new Label
+        {
+            Text = "Name -- \r\nBank -- <1>"
+        };
+
+        static Label PlayerProfileLabel2 = new Label
+        {
+            Text = "Name -- \r\nBank -- <2>"
+        };
+
+        static Label PlayerProfileLabel3 = new Label
+        {
+            Text = "Name -- \r\nBank -- <3>"
+        };
+
+        static Label PlayerProfileLabel4 = new Label
+        {
+            Text = "Name -- \r\nBank -- <4>"
+        };
+
+        static Label PlayerProfileLabel5 = new Label
+        {
+            Text = "Name -- \r\nBank -- <5>"
+        };
+
+        static Label PlayerProfileLabel6 = new Label
+        {
+            Text = "Name -- \r\nBank -- <6>"
+        };
+
+        static Label PlayerProfileLabel7 = new Label
+        {
+            Text = "Name -- \r\nBank -- <7>"
+        };
+
+        static Label PlayerProfileLabel8 = new Label
+        {
+            Text = "Name -- \r\nBank -- <8>"
+        };
+
+        static Label PlayerProfileLabel9 = new Label
+        {
+            Text = "Name -- \r\nBank -- <9>"
+        };
+
+        static Label PlayerProfileLabel10 = new Label
+        {
+            Text = "Name -- \r\nBank -- <10>"
         };
     }
 }

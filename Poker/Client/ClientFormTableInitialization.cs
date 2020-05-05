@@ -10,18 +10,19 @@ namespace Client
 {
     public partial class ClientForm
     {
+
         private void InitializeGameTable()
         {
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Sky
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
-            GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Image
+            GameTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 300)); // Image
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 5)); // Title
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20)); // Moves Chat
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 5)); // Basement
 
 
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Left
-            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80)); // Moves Chat
+            GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 600)); // Moves Chat
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Right
 
             GameTable.Dock = DockStyle.Fill;
@@ -38,7 +39,8 @@ namespace Client
 
             // Poker Table (image-graphics)
             GameTable.Controls.Add(new Panel(), 0, 2); // Left
-            GameTable.Controls.Add(new Panel(), 1, 2); // Poker Table
+            GameTable.Controls.Add(TablePanel, 1, 2); // Poker Table
+            
             GameTable.Controls.Add(new Panel(), 2, 2); // Right
 
             // Title
@@ -89,6 +91,7 @@ namespace Client
             ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 60));
             ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
             ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+            ChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); // New
             ChatTable.Controls.Add(GameChatBox, 0, 0);
             ChatTable.Controls.Add(ChatMessageInput, 0, 1);
             ChatTable.Controls.Add(SendButton, 0, 2);
@@ -98,12 +101,60 @@ namespace Client
 
 
             // ---------------------------------- /ChatBox -------------------------------------
+            //
 
+            // ------------------------------------ CardTable ----------------------------
+            TableCardsTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+            TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
+
+            TableCardsTable.Controls.Add(TableCard1, 0, 0);
+            TableCardsTable.Controls.Add(TableCard2, 1, 0);
+            TableCardsTable.Controls.Add(TableCard3, 2, 0);
+            TableCardsTable.Controls.Add(TableCard4, 3, 0);
+            TableCardsTable.Controls.Add(TableCard5, 4, 0);
+
+            TableCardsTable.Size = new Size((int)(PokerTableSize.Width * 0.30), (int)(PokerTableSize.Height * 0.22));
+            TableCardsTable.Location = new Point((int)(PokerTableSize.Width * 0.35), (int)(PokerTableSize.Height * 0.35));
+            // -------------------------------------- Profiles =-------------------
+            var ProfileSize = new Size((int)(PokerTableSize.Width * 0.12), (int)(PokerTableSize.Height * 0.12));
+            foreach (var seatNum in PlayerProfileLabels.Keys)
+            {
+                PlayerProfileLabels[seatNum].Size = ProfileSize;
+            }
+            PlayerProfileLabel1.Location = new Point((int)(PokerTableSize.Width * 0.72), (int)(PokerTableSize.Height * 0.04));
+            PlayerProfileLabel2.Location = new Point((int)(PokerTableSize.Width * 0.84), (int)(PokerTableSize.Height * 0.25));
+            PlayerProfileLabel3.Location = new Point((int)(PokerTableSize.Width * 0.84), (int)(PokerTableSize.Height * 0.62));
+            PlayerProfileLabel4.Location = new Point((int)(PokerTableSize.Width * 0.72), (int)(PokerTableSize.Height * 0.83));
+            PlayerProfileLabel5.Location = new Point((int)(PokerTableSize.Width * 0.44), (int)(PokerTableSize.Height * 0.83));
+            PlayerProfileLabel6.Location = new Point((int)(PokerTableSize.Width * 0.16), (int)(PokerTableSize.Height * 0.83));
+            PlayerProfileLabel7.Location = new Point((int)(PokerTableSize.Width * 0.04), (int)(PokerTableSize.Height * 0.62));
+            PlayerProfileLabel8.Location = new Point((int)(PokerTableSize.Width * 0.04), (int)(PokerTableSize.Height * 0.25));
+            PlayerProfileLabel9.Location = new Point((int)(PokerTableSize.Width * 0.16), (int)(PokerTableSize.Height * 0.04));
+            PlayerProfileLabel10.Location = new Point((int)(PokerTableSize.Width * 0.44), (int)(PokerTableSize.Height * 0.04));
+
+            // ---------------------------------------/ Profiles -------------------
+
+            // -------------------------------- /CardTable ---------------------------------
 
 
             GameTable.Controls.Add(new Panel(), 0, 5);
             GameTable.Controls.Add(new Panel(), 1, 5);
             GameTable.Controls.Add(new Panel(), 2, 5);
+
+
+            // ---------------------------- ADDING CONTROLS to TABLE PANEL
+            foreach (var seatNum in PlayerProfileLabels.Keys)
+            {
+                TablePanel.Controls.Add(PlayerProfileLabels[seatNum]);
+            }
+
+            TablePanel.Controls.Add(TableCardsTable);
+
+            TablePanel.Controls.Add(PBox);
         }
 
         private void InitializeCreateTable()

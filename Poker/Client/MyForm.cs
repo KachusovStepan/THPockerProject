@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Client
 {
@@ -13,6 +14,20 @@ namespace Client
     {
         GameProxy Game;
         SyncTimer STimer;
+        Size PokerTableSize = new Size(600, 300);
+        Dictionary<int, Label> PlayerProfileLabels = new Dictionary<int, Label>()
+        {
+            { 0, PlayerProfileLabel1},
+            { 1, PlayerProfileLabel2},
+            { 2, PlayerProfileLabel3},
+            { 3, PlayerProfileLabel4},
+            { 4, PlayerProfileLabel5},
+            { 5, PlayerProfileLabel6},
+            { 6, PlayerProfileLabel7},
+            { 7, PlayerProfileLabel8},
+            { 8, PlayerProfileLabel9},
+            { 9, PlayerProfileLabel10}
+        };
         // Таблицы
         TableLayoutPanel MenuTable = new TableLayoutPanel();
         TableLayoutPanel ChooseGameTable = new TableLayoutPanel();
@@ -23,11 +38,19 @@ namespace Client
         TableLayoutPanel MovesChatTable = new TableLayoutPanel();
         TableLayoutPanel MovesTable = new TableLayoutPanel();
         TableLayoutPanel ChatTable = new TableLayoutPanel();
+        TableLayoutPanel TableCardsTable = new TableLayoutPanel();
+
+        Panel TablePanel = new Panel() {
+            Dock = DockStyle.Fill
+        };
 
         Thread TimerThread;
 
+        // Background updating
         Action<int> ChangeChat;
         Action<int> ChangeStartedGamesBox;
+
+        
 
         public ClientForm(GameProxy game)
         {
