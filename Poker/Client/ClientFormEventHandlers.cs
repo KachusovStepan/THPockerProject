@@ -20,6 +20,7 @@ namespace Client
                 if (!success)
                     return;
                 this.STimer.Tick -= ChangeChat;
+                this.STimer.Tick -= UpdatePlayerProfiles;
                 Console.WriteLine("Leaved");
 
                 Controls.Remove(GameTable);
@@ -183,6 +184,7 @@ namespace Client
 
                 this.STimer.Tick -= ChangeStartedGamesBox;
                 this.STimer.Tick += ChangeChat;
+                this.STimer.Tick += UpdatePlayerProfiles;
                 // 5) Переключение таблиц
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(GameTable);
@@ -232,6 +234,7 @@ namespace Client
                 Console.WriteLine("Joined");
                 this.GameIdLabel.Text = String.Format("Game ID: {0}", targetId.ToString());
                 this.STimer.Tick += ChangeChat;
+                this.STimer.Tick += UpdatePlayerProfiles;
                 // 5) Переключение таблиц
                 Controls.Remove(CreateGameTable);
                 Controls.Add(GameTable);

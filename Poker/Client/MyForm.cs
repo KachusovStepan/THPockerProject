@@ -49,6 +49,7 @@ namespace Client
         // Background updating
         Action<int> ChangeChat;
         Action<int> ChangeStartedGamesBox;
+        Action<int> UpdatePlayerProfiles;
 
         
 
@@ -93,6 +94,20 @@ namespace Client
                     if (this.GameChatBox.Text != "")
                         this.GameChatBox.Text += "\r\n";
                     this.GameChatBox.Text += Game.CurrentState.Chat[i];
+                }
+            };
+
+            UpdatePlayerProfiles = (int t) =>
+            {
+                for (int i = 0; i < 10; i++) {
+                    if (Game.CurrentState.Banks.ContainsKey(i))
+                    {
+                        PlayerProfileLabels[i].Visible = true;
+                        PlayerProfileLabels[i].Text = String.Format("Name -- Bank {0}", Game.CurrentState.Banks[i]);
+                    }
+                    else {
+                        PlayerProfileLabels[i].Visible = false;
+                    }
                 }
             };
 
