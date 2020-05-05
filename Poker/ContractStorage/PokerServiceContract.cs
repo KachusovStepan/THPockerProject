@@ -60,5 +60,11 @@ namespace ContractStorage
 
         [OperationContract]
         bool[] CheckAlive(int gameId);
+
+        [OperationContract]
+        bool StartGame(int gameId, int playerId);
+
+        [OperationContract]
+        bool IsGameStarted(int gameId);
     }
 }

@@ -47,9 +47,10 @@ namespace Client
         Thread TimerThread;
 
         // Background updating
-        Action<int> ChangeChat;
+        Action<int> GetState;
         Action<int> ChangeStartedGamesBox;
         Action<int> UpdatePlayerProfiles;
+        Action<int> AskGameStarted;
 
         
 
@@ -83,7 +84,8 @@ namespace Client
             SetGameHandlers();
 
             // Делегат для обновления чата
-            ChangeChat = (int t) => {
+            GetState = (int t) => {
+                var currPlayerCount = Game.PlayerNames.Count;
                 var success = Game.UpdateRegularData();
                 if (!success) {
                     return;
@@ -95,6 +97,10 @@ namespace Client
                         this.GameChatBox.Text += "\r\n";
                     this.GameChatBox.Text += Game.CurrentState.Chat[i];
                 }
+
+                if (currPlayerCount != Game.CurrentState.PlayerCount) {
+                    Game.SetPlayerNames(Game.CurrentGameId);
+                }
             };
 
             UpdatePlayerProfiles = (int t) =>
@@ -103,11 +109,26 @@ namespace Client
                     if (Game.CurrentState.Banks.ContainsKey(i))
                     {
                         PlayerProfileLabels[i].Visible = true;
-                        PlayerProfileLabels[i].Text = String.Format("Name -- Bank {0}", Game.CurrentState.Banks[i]);
+                        if (Game.CurrentState.CurrentPlayer == i)
+                            PlayerProfileLabels[i].Text = String.Format("> {1}\r\n{0}$\r\nBet: {2}$", Game.CurrentState.Banks[i], Game.PlayerNames[i], Game.CurrentState.TableBanks[i]);
+                        else
+                            PlayerProfileLabels[i].Text = String.Format("{1}\r\n{0}$\r\nBet: {2}$", Game.CurrentState.Banks[i], Game.PlayerNames[i], Game.CurrentState.TableBanks[i]);
                     }
                     else {
                         PlayerProfileLabels[i].Visible = false;
                     }
+                }
+
+            };
+
+            AskGameStarted = (int t) =>
+            {
+                Console.WriteLine("Asking Game -------------------------<");
+                var started = Game.Proxy.IsGameStarted(Game.CurrentGameId);
+                if (started) {
+                    STimer.Tick -= AskGameStarted;
+                    StartButton.Enabled = false;
+                    StartButton.Visible = false;
                 }
             };
 

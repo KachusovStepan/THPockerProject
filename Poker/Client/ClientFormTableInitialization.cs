@@ -29,7 +29,7 @@ namespace Client
 
             // Sky
             GameTable.Controls.Add(LeaveGameButton, 0, 0);
-            GameTable.Controls.Add(new Panel(), 1, 0);
+            GameTable.Controls.Add(StartButton, 1, 0);
             GameTable.Controls.Add(GameIdLabel, 2, 0);
 
             // Title
@@ -119,6 +119,12 @@ namespace Client
 
             TableCardsTable.Size = new Size((int)(PokerTableSize.Width * 0.30), (int)(PokerTableSize.Height * 0.22));
             TableCardsTable.Location = new Point((int)(PokerTableSize.Width * 0.35), (int)(PokerTableSize.Height * 0.35));
+
+            // ------------------------------------ Bank ---------------------------------
+            BankLabel.Size = new Size((int)(PokerTableSize.Width * 0.12), (int)(PokerTableSize.Height * 0.07));
+            BankLabel.Location = new Point((int)(PokerTableSize.Width * 0.44), (int)(PokerTableSize.Height * 0.62));
+            // ------------------------------------ /Bank -------------------------------
+
             // -------------------------------------- Profiles =-------------------
             var ProfileSize = new Size((int)(PokerTableSize.Width * 0.12), (int)(PokerTableSize.Height * 0.12));
             foreach (var seatNum in PlayerProfileLabels.Keys)
@@ -147,6 +153,7 @@ namespace Client
 
 
             // ---------------------------- ADDING CONTROLS to TABLE PANEL
+            TablePanel.Controls.Add(BankLabel);
             foreach (var seatNum in PlayerProfileLabels.Keys)
             {
                 TablePanel.Controls.Add(PlayerProfileLabels[seatNum]);

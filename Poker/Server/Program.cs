@@ -9,7 +9,7 @@ namespace Server
     class Program : IDisposable
     {
         private static ServiceHost serviceHost;
-        public static Queue<int> GamesToStart = new Queue<int>();
+        //public static Queue<int> GamesToStart = new Queue<int>();
         private static void StartServer(string address) {
             if (address[address.Length - 1] == '/')
                 address = address.Substring(0, address.Length - 1);
@@ -35,8 +35,8 @@ namespace Server
             var Ticks = 50;
             while (true) {
                 Ticks--;
-                while (GamesToStart.Count != 0) {
-                    var gameIdToStart = GamesToStart.Dequeue();
+                while (Game.GamesToStart.Count != 0) {
+                    var gameIdToStart = Game.GamesToStart.Dequeue();
 
                     var game = TryGetGame(gameIdToStart);
                     WaitCallback task = (state) => game.Start();
@@ -52,15 +52,52 @@ namespace Server
             serviceHost = null;
         }
 
-        static void Main(string[] args) {
-            Console.Title = "Server";
-            StartServer("http://localhost:8000/");
+        static void MainA(string[] args) {
 
-            Console.WriteLine("Press any key to finish");
+            StartServer("http://localhost:8000/");
+            Console.WriteLine("< Server is Running >");
 
             Console.WriteLine("Press any key to finish");
             Console.ReadKey();
             serviceHost.Close();
+            Console.WriteLine("Server successfully Finishd");
+        }
+
+        static void Main(string[] args) {
+            Console.Title = "Server";
+            StartServer("http://localhost:8000/");
+            Console.WriteLine("< Server is Running >");
+            var limit = 120;
+            var gamesRunningActions = new List<Action>();
+            var startedGames = new List<IAsyncResult>();
+            while (true)
+            {
+                Console.WriteLine("Checking to start game");
+                limit--;
+                if (limit <= 0)
+                    break;
+                while (Game.GamesToStart.Count != 0)
+                {
+                    var gameIdToStart = Game.GamesToStart.Dequeue();
+
+                    var game = TryGetGame(gameIdToStart);
+                    if (game is null)
+                        continue;
+                    var gameToRun = new Action(game.Start);
+                    gamesRunningActions.Add(gameToRun);
+                    startedGames.Add(gameToRun.BeginInvoke(null, null));
+                    for (int i = 0; i < startedGames.Count; i++) {
+                        if (startedGames[i].IsCompleted) {
+                            gamesRunningActions[i].EndInvoke(startedGames[i]);
+                            gamesRunningActions.RemoveAt(i);
+                            startedGames.RemoveAt(i);
+                            Console.WriteLine("Game {0} -- Started", gameIdToStart);
+                        }
+                    }
+                }
+                Thread.Sleep(1000);
+            }
+            Console.WriteLine("STOPPING");
         }
 
         // Не работает

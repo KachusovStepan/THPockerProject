@@ -19,8 +19,9 @@ namespace Client
                 var success = Game.LeaveTheGame();
                 if (!success)
                     return;
-                this.STimer.Tick -= ChangeChat;
+                this.STimer.Tick -= GetState;
                 this.STimer.Tick -= UpdatePlayerProfiles;
+                this.STimer.Tick -= AskGameStarted;
                 Console.WriteLine("Leaved");
 
                 Controls.Remove(GameTable);
@@ -135,6 +136,21 @@ namespace Client
             };
 
             // ------------------------ /MOVES --------------------------------
+
+            StartButton.Click += (sender, args) =>
+            {
+                Console.WriteLine("- <Start Buttom> -");
+                if (Game.CurrentState.PlayerCount <= 1)
+                    return;
+                var success = Game.Proxy.StartGame(Game.CurrentGameId, Game.PlayerId);
+                if (!success)
+                    return;
+                STimer.Tick -= AskGameStarted;
+                Console.WriteLine("Starting Game");
+                StartButton.Enabled = false;
+                StartButton.Visible = false;
+                
+            };
         }
 
         private void SetChooseHandlers()
@@ -183,8 +199,9 @@ namespace Client
                 this.GameIdLabel.Text = String.Format("Game ID: {0}", targetId.ToString());
 
                 this.STimer.Tick -= ChangeStartedGamesBox;
-                this.STimer.Tick += ChangeChat;
+                this.STimer.Tick += GetState;
                 this.STimer.Tick += UpdatePlayerProfiles;
+                this.STimer.Tick += AskGameStarted;
                 // 5) Переключение таблиц
                 Controls.Remove(ChooseGameTable);
                 Controls.Add(GameTable);
@@ -233,8 +250,9 @@ namespace Client
                     return;
                 Console.WriteLine("Joined");
                 this.GameIdLabel.Text = String.Format("Game ID: {0}", targetId.ToString());
-                this.STimer.Tick += ChangeChat;
+                this.STimer.Tick += GetState;
                 this.STimer.Tick += UpdatePlayerProfiles;
+                this.STimer.Tick += AskGameStarted;
                 // 5) Переключение таблиц
                 Controls.Remove(CreateGameTable);
                 Controls.Add(GameTable);

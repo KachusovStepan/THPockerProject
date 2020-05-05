@@ -329,5 +329,16 @@ namespace Client
         {
             Text = "Name -- \r\nBank -- <10>"
         };
+
+        static Button StartButton = new Button()
+        {
+            Text = "Start",
+            Dock = DockStyle.Fill
+        };
+
+        static Label BankLabel = new Label
+        {
+            Text = "0$",
+        };
     }
 }

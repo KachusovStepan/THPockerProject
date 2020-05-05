@@ -84,8 +84,10 @@ namespace Server
         public List<string> chat { get; private set; }
         public int roundMaxBet { get; private set; }
         public readonly Dictionary<int, BetNode> PlayerBets;
+        public bool Started;
 
         private static Dictionary<int, Game> GameInstances = new Dictionary<int, Game>();
+        public static Queue<int> GamesToStart = new Queue<int>();
 
         // Multiton
         private Game(int gameId)
@@ -104,6 +106,7 @@ namespace Server
             Deck = new CardDeck();
             PlayerBets = new Dictionary<int, BetNode>();
             chat = new List<string>();
+            Started = false;
         }
         public static Game GetGameInstance(int gameId)
         {
@@ -238,6 +241,7 @@ namespace Server
 
         public void Start()
         {
+            Started = true;
             Func<Action, bool> conductBettingRoungAndReportIfRoundIsOver = currentRound =>
             {
                 currentRound();

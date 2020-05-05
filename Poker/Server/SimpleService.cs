@@ -10,6 +10,24 @@ namespace Server
     [ServiceBehavior(IncludeExceptionDetailInFaults = true)]
     class MyService : IContract
     {
+        public bool IsGameStarted(int gameId) {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return false;
+            return game.Started;
+        }
+        public bool StartGame(int gameId, int playerId) {
+            var game = TryGetGame(gameId);
+            if (game is null)
+                return false;
+            if (!game.PlayerByID.ContainsKey(playerId))
+                return false;
+            if (game.Started)
+                return false;
+            Game.GamesToStart.Enqueue(gameId);
+            Console.WriteLine("Added Game to Queue to Start");
+            return true;
+        }
         public Dictionary<int, int> ShowExistingGames()
         {
             var games = Game.ShowGames();
@@ -22,7 +40,7 @@ namespace Server
             if (successed)
             {
                 Console.WriteLine("Added Game to Queue to Start");
-                Program.GamesToStart.Enqueue(gameId);
+                //Program.GamesToStart.Enqueue(gameId);
             }
             return successed;
         }

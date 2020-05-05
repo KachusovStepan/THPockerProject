@@ -35,6 +35,7 @@ namespace Client
         public Dictionary<TurnRole, int> RoleSeat;
         public State CurrentState;
         public int MessagePointer;
+        public bool Started;
         public GameProxy(IContract proxy) {
             Proxy = proxy;
             GamePlayerCountDict = new Dictionary<int, int>();
