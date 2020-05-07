@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.ServiceModel;
 
 namespace Client
 {
@@ -67,9 +68,28 @@ namespace Client
 
                 if (bet < 2) {
                     return;
-                } 
-
-                success = Game.MakeBet(bet);
+                }
+                try
+                {
+                    success = Game.MakeBet(bet);
+                }
+                catch (CommunicationException ce) {
+                    this.STimer.Tick -= GetState;
+                    this.STimer.Tick -= UpdatePlayerProfiles;
+                    this.STimer.Tick -= AskGameStarted;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(GameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                    return;
+                }
                 if (!success) {
                     Console.WriteLine("Fail to Make Bet");
                     return;
@@ -82,13 +102,33 @@ namespace Client
             CallButton.Click += (sender, args) =>
             {
                 Console.WriteLine("* <Call Buttom> *");
-                var success = Game.MakeCall();
-                if (!success)
-                {
-                    Console.WriteLine("Fail to Make Call");
-                    return;
+                var success = false;
+                try {
+                    success = Game.MakeCall();
                 }
-            };
+                catch (CommunicationException ce)
+                {
+                    this.STimer.Tick -= GetState;
+                    this.STimer.Tick -= UpdatePlayerProfiles;
+                    this.STimer.Tick -= AskGameStarted;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(GameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                }
+                if (!success)
+                    {
+                        Console.WriteLine("Fail to Make Call");
+                        return;
+                    }
+                };
 
             // 1) Попытка сделать ход
             RaiseButton.Click += (sender, args) =>
@@ -103,7 +143,27 @@ namespace Client
                     return;
                 }
 
-                success = Game.MakeRaise(bet);
+                try
+                {
+                    success = Game.MakeRaise(bet);
+                }
+                catch (CommunicationException ce)
+                {
+                    this.STimer.Tick -= GetState;
+                    this.STimer.Tick -= UpdatePlayerProfiles;
+                    this.STimer.Tick -= AskGameStarted;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(GameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                }
                 if (!success)
                 {
                     Console.WriteLine("Fail to Make Raise");
@@ -117,7 +177,28 @@ namespace Client
             CheckButton.Click += (sender, args) =>
             {
                 Console.WriteLine("* <Check Buttom> *");
-                var success = Game.MakeCheck();
+                var success = false;
+                try
+                {
+                    success = Game.MakeCheck();
+                }
+                catch (CommunicationException ce)
+                {
+                    this.STimer.Tick -= GetState;
+                    this.STimer.Tick -= UpdatePlayerProfiles;
+                    this.STimer.Tick -= AskGameStarted;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(GameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                }
                 if (!success)
                 {
                     Console.WriteLine("Fail to Make Check");
@@ -128,7 +209,28 @@ namespace Client
             FoldButton.Click += (sender, args) =>
             {
                 Console.WriteLine("* <Fold Buttom> *");
-                var success = Game.MakeFold();
+                var success = false;
+                try
+                {
+                    success = Game.MakeFold();
+                }
+                catch (CommunicationException ce)
+                {
+                    this.STimer.Tick -= GetState;
+                    this.STimer.Tick -= UpdatePlayerProfiles;
+                    this.STimer.Tick -= AskGameStarted;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(GameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                }
                 if (!success)
                 {
                     Console.WriteLine("Fail to Make Fold");
@@ -142,10 +244,32 @@ namespace Client
                 Console.WriteLine("- <Start Buttom> -");
                 if (Game.CurrentState.PlayerCount <= 1)
                     return;
-                var success = Game.Proxy.StartGame(Game.CurrentGameId, Game.PlayerId);
+                var success = false;
+                try
+                {
+                    success = Game.Proxy.StartGame(Game.CurrentGameId, Game.PlayerId);
+                }
+                catch (CommunicationException ce)
+                {
+                    this.STimer.Tick -= GetState;
+                    this.STimer.Tick -= UpdatePlayerProfiles;
+                    this.STimer.Tick -= AskGameStarted;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(GameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                }
+
                 if (!success)
                     return;
-                STimer.Tick -= AskGameStarted;
+                //STimer.Tick -= AskGameStarted;
                 Console.WriteLine("Starting Game");
                 StartButton.Enabled = false;
                 StartButton.Visible = false;
@@ -191,7 +315,26 @@ namespace Client
                 Console.WriteLine("Set state of {0}", targetId);
 
                 // 4) Подключение к игре
-                success = Game.TryJoinTheGame(targetId);
+                try
+                {
+                    success = Game.TryJoinTheGame(targetId);
+                }
+                catch (CommunicationException ce) {
+                    STimer.Tick -= ChangeStartedGamesBox;
+                    this.StartedGames.Text = "No Connection";
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(ChooseGameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                    return;
+                }
+
                 if (!success)
                     return;
                 Game.CurrentGameId = targetId;
@@ -226,7 +369,7 @@ namespace Client
             CreateGame.Click += (sender, args) =>
             {
                 Console.WriteLine("- <CreateGame Buttom> -");
-                var gameIdSting = this.MinFeeInput.Text;
+                var gameIdSting = this.GameIdInput.Text;
                 // 1) Парс текста
                 var successed = int.TryParse(gameIdSting, out int targetId);
 
@@ -235,7 +378,23 @@ namespace Client
 
                 Console.WriteLine("Success parsed {0}", targetId);
                 // 2) Cоздание игры
-                successed = Game.CreateNewGame(targetId);
+                try
+                {
+                    successed = Game.CreateNewGame(targetId);
+                }
+                catch (CommunicationException se) {
+                    var msg = "Server is not Responding";
+                    var msgButtons = MessageBoxButtons.OK;
+                    var caption = "... Back to Menu";
+                    var msgQuestion = MessageBoxIcon.Error;
+                    var result = MessageBox.Show(msg, caption, msgButtons, msgQuestion);
+                    if (result == DialogResult.OK)
+                    {
+                        this.Controls.Remove(CreateGameTable);
+                        this.Controls.Add(MenuTable);
+                    }
+                    return;
+                }
                 if (!successed)
                     return;
 
@@ -243,6 +402,7 @@ namespace Client
 
                 Game.CurrentGameId = targetId;
                 // 3) Установка имен участников
+
                 Game.SetPlayerNames(Game.CurrentGameId);
                 // 4) Подключение к игре
                 var success = Game.TryJoinTheGame(Game.CurrentGameId);

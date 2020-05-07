@@ -29,7 +29,30 @@ namespace ContractStorage
         [DataMember]
         public List<string> Chat;
 
-        public State(int playerCount, Dictionary<int, int> banks, Dictionary<int, int> tableBanks, int tableBank, int currPlayer, List<string> chat)
+        [DataMember]
+        public Dictionary<char, int> Blinds;
+
+        [DataMember]
+        public char Round;
+
+        [DataMember]
+        public string Cards;
+
+        [DataMember]
+        public bool[] Ready;
+
+        public State() {
+            PlayerCount = 0;
+            Banks = new Dictionary<int, int>();
+            TableBank = 0;
+            TableBanks = new Dictionary<int, int>();
+            CurrentPlayer = -1;
+            Chat = new List<string>();
+            Blinds = new Dictionary<char, int>();
+            Round = 'n';
+        }
+
+        public State(int playerCount, Dictionary<int, int> banks, Dictionary<int, int> tableBanks, int tableBank, int currPlayer, List<string> chat, Dictionary<char, int> blinds, char round, string cards, bool[] ready)
         {
             PlayerCount = playerCount;
             Banks = banks;
@@ -37,6 +60,10 @@ namespace ContractStorage
             TableBanks = tableBanks;
             CurrentPlayer = currPlayer;
             Chat = chat;
+            Blinds = blinds;
+            Round = round;
+            Cards = cards;
+            Ready = ready;
         }
     }
 }

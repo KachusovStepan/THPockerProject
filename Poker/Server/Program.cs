@@ -67,7 +67,7 @@ namespace Server
             Console.Title = "Server";
             StartServer("http://localhost:8000/");
             Console.WriteLine("< Server is Running >");
-            var limit = 120;
+            var limit = 500;
             var gamesRunningActions = new List<Action>();
             var startedGames = new List<IAsyncResult>();
             while (true)

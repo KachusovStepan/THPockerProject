@@ -1,0 +1,85 @@
+Texas Hold’em poker rules
+The Roles
+There are three player’s roles in the game:
+1)	Big blind (BB)
+2)	Small blind (SB)
+3)	The Button (D)
+These are forced bets required by two players.
+The big blind (usually double that of the small blind) is then paid by the player to the left of the small blind. The size of the blinds will dictate the stakes of the game you’re about to play.
+The Big blind followed by Small blind. Small blind followed by The Button (player-dealer).
+For example: 
+•	BB – 2$
+•	SB – 1$
+•	D – 0$
+The maximum and minimum amount a player can be in for will be in relation to the blinds.
+For example, in a $1/$2 game the table minimum is usually $40 (20x the big blind) and the maximum is $200 (100x the big blind).
+The SB is directly to the left of the D. And BB is on the left of the SB.
+
+Rounds
+There four rounds:
+1)	The Pre-flop
+2)	The Flop
+3)	The Turn
+4)	The River
+All betting rounds begin with the player to the button’s left and continue clockwise.
+The Pre-flop
+No face-up cards.
+The round begins with the SB and continuing clockwise.
+A round of betting continues until every player:
+1) has folded
+2) put in all of their chips
+3) matched the amount put in by all other active players.
+ If every active player called the BB, he can raise or check.
+The flop
+Free face-up cards appear.
+Players start betting.
+The Turn (or the Four street)
+A single community card appears.
+The river (the Fifth street)
+A final single community card appears.
+Showdown
+If only one player remains in a game, there no requirement to show the cards.
+If two or more players remain after the final betting round, a showdown occurs.
+
+On the showdown, each player plays the best poker hand they can make from the seven cards comprising his two cards and the five community cards.
+A player may use both of his own two cards, only one, or none at all, to form his final five-card hand.
+If the five community cards form the player’s best hand, then the player is said to be playing the board and can only hope to split the pot, because each other player can also use the same five cards to construct the same hand.
+
+Card combinations
+There are 10 possible card combinations ordered by their worth:
+1)	Highcard
+Simple value of the card.
+2)	Pair 
+Two cards with the same value
+3)	Two pairs 
+Two times two cards with the same value
+4)	Three of a kind 
+Three cards with the same value
+5)	Straight 
+Sequence of 5 cards in increasing value (Ace can precede 2 and follow up King)
+6)	Flush 
+5 cards of the same suit
+7)	Full house 
+Combination of three of a kind and a pair
+8)	Four of a kind 
+Four cards of the same value
+9)	Straight flush 
+Straight of the same suit
+10)	Royal flush 
+Straight flush from Ten to Ace
+The weakest one is Highcard. The most powerful is Royal flush
+Betting
+Players can act in many ways:
+1)	Call
+Matching the bet made by another player.
+2)	Raise
+To match the bet made by a previous player and increasing the total amount of the bet.
+3)	Check
+If a player chooses to not bet with no action ahead of them, they can check.
+4)	Fold
+Throwing away your hand to avoid having to call a bet.
+5)	Bet
+1)	Chips or money put into the pot as the first action in a betting round.
+2)	The count of actions made in the hand.
+6)	All-in
+Having the entirety of your stack in the pot.

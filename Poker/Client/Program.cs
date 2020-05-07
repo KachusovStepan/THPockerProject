@@ -12,6 +12,7 @@ namespace Client
     class Program
     {
         public static IContract Proxy;
+        [STAThread]
         static void Main()
         {
             Connect("http://localhost:8000/ServiceWCF");
@@ -23,6 +24,7 @@ namespace Client
             Console.WriteLine("Press <Any Key> to finish Client");
             Console.ReadKey();
 
+            Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new ClientForm(new GameProxy(Proxy)));
         }
 

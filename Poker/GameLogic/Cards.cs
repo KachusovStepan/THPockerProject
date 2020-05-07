@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text;
 
 namespace GameLogic
 {
@@ -121,6 +121,16 @@ namespace GameLogic
         {
             var repr = string.Format("{0}{1}", suitChar[Suit], rankChar[Rank]);
             return repr;
+        }
+
+        public static string FromCardListToString(List<Card> cardList) {
+            var boulder = new StringBuilder();
+            foreach (var card in cardList) {
+                boulder.Append(card.GetSimpleRepresentation() + " ");
+            }
+            if (boulder.Length != 0)
+                boulder.Remove(boulder.Length - 1, 1);
+            return boulder.ToString();
         }
 
         public static bool operator ==(Card card1, Card card2)

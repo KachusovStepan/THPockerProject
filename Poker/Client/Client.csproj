@@ -58,6 +58,9 @@
     </Compile>
     <Compile Include="Delegates.cs" />
     <Compile Include="GameProxy.cs" />
+    <Compile Include="MyButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MyForm.cs">
       <SubType>Form</SubType>
     </Compile>

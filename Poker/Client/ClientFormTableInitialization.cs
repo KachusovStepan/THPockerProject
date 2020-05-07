@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Client
 {
@@ -13,6 +14,7 @@ namespace Client
 
         private void InitializeGameTable()
         {
+            GameTable.RowCount = 6;
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Sky
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 10)); // Title
             GameTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 300)); // Image
@@ -20,10 +22,12 @@ namespace Client
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20)); // Moves Chat
             GameTable.RowStyles.Add(new RowStyle(SizeType.Percent, 5)); // Basement
 
-
+            GameTable.ColumnCount = 3;
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Left
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 600)); // Moves Chat
             GameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Right
+
+            GameTable.BackColor = System.Drawing.Color.Transparent;
 
             GameTable.Dock = DockStyle.Fill;
 
@@ -41,7 +45,7 @@ namespace Client
             GameTable.Controls.Add(new Panel(), 0, 2); // Left
             GameTable.Controls.Add(TablePanel, 1, 2); // Poker Table
             
-            GameTable.Controls.Add(new Panel(), 2, 2); // Right
+            GameTable.Controls.Add(RuleBox, 2, 2); // Right
 
             // Title
             GameTable.Controls.Add(new Panel(), 0, 3);
@@ -57,19 +61,24 @@ namespace Client
             //GameTable.Controls.Add(new Panel(), 5, 4);
             //
             MovesChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
+            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40));
+            MovesChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
             MovesChatTable.Dock = DockStyle.Fill;
             GameTable.Controls.Add(MovesChatTable, 1, 4);
 
 
             // --------------------------------- MOVES -------------------------------------
+            MovesTable.RowCount = 2;
             MovesTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Call Check BetInput
             MovesTable.RowStyles.Add(new RowStyle(SizeType.Percent, 50)); // Raise Fold Bet
 
+            MovesTable.ColumnCount = 3;
             MovesTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33)); // Call Raise
             MovesTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33)); // Check Fold
             MovesTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34)); // BetInput Bet
+
+            MovesTable.BackColor = System.Drawing.Color.Transparent;
 
             MovesTable.Controls.Add(CallButton, 0, 0);
             MovesTable.Controls.Add(CheckButton, 1, 0);
@@ -87,11 +96,15 @@ namespace Client
 
 
             // --------------------------------- ChatBox -------------------------------------
-
+            ChatTable.RowCount = 3;
             ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 60));
             ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
             ChatTable.RowStyles.Add(new RowStyle(SizeType.Percent, 20));
+
+            ChatTable.ColumnCount = 1;
             ChatTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); // New
+
+            ChatTable.BackColor = System.Drawing.Color.Transparent;
             ChatTable.Controls.Add(GameChatBox, 0, 0);
             ChatTable.Controls.Add(ChatMessageInput, 0, 1);
             ChatTable.Controls.Add(SendButton, 0, 2);
@@ -101,7 +114,23 @@ namespace Client
 
 
             // ---------------------------------- /ChatBox -------------------------------------
-            //
+
+            // ---------------------------------- PlayerCards ------------------------------------
+            PlayerCardsTable.RowCount = 1;
+            PlayerCardsTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+
+            PlayerCardsTable.ColumnCount = 2;
+            PlayerCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            PlayerCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+
+            PlayerCardsTable.BackColor = System.Drawing.Color.Transparent;
+
+            PlayerCardsTable.Dock = DockStyle.Fill;
+            PlayerCardsTable.Controls.Add(PlayerCard1, 0, 0);
+            PlayerCardsTable.Controls.Add(PlayerCard2, 1, 0);
+
+            MovesChatTable.Controls.Add(PlayerCardsTable, 2, 0);
+            // ---------------------------------- /PlayerCards
 
             // ------------------------------------ CardTable ----------------------------
             TableCardsTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
@@ -110,19 +139,25 @@ namespace Client
             TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
             TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
             TableCardsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20));
-
+            TableCardsTable.BackColor = System.Drawing.Color.Transparent;
+            //TableCardsTable.BackColor = System.Drawing.Color.Green;
+            TableCardsTable.AllowDrop = true;
             TableCardsTable.Controls.Add(TableCard1, 0, 0);
             TableCardsTable.Controls.Add(TableCard2, 1, 0);
             TableCardsTable.Controls.Add(TableCard3, 2, 0);
             TableCardsTable.Controls.Add(TableCard4, 3, 0);
             TableCardsTable.Controls.Add(TableCard5, 4, 0);
 
-            TableCardsTable.Size = new Size((int)(PokerTableSize.Width * 0.30), (int)(PokerTableSize.Height * 0.22));
+            
+
+
+            //TableCardsTable.Size = new Size((int)(PokerTableSize.Width * 0.30), (int)(PokerTableSize.Height * 0.22));
+            TableCardsTable.Size = new Size((int)(PokerTableSize.Width * 0.30), (int)(PokerTableSize.Height * 0.17));
             TableCardsTable.Location = new Point((int)(PokerTableSize.Width * 0.35), (int)(PokerTableSize.Height * 0.35));
 
             // ------------------------------------ Bank ---------------------------------
-            BankLabel.Size = new Size((int)(PokerTableSize.Width * 0.12), (int)(PokerTableSize.Height * 0.07));
-            BankLabel.Location = new Point((int)(PokerTableSize.Width * 0.44), (int)(PokerTableSize.Height * 0.62));
+            BankLabel.Size = new Size((int)(PokerTableSize.Width * 0.12), (int)(PokerTableSize.Height * 0.07)); // 12
+            BankLabel.Location = new Point((int)(PokerTableSize.Width * 0.44), (int)(PokerTableSize.Height * 0.70)); // 0.62
             // ------------------------------------ /Bank -------------------------------
 
             // -------------------------------------- Profiles =-------------------
@@ -153,7 +188,14 @@ namespace Client
 
 
             // ---------------------------- ADDING CONTROLS to TABLE PANEL
-            TablePanel.Controls.Add(BankLabel);
+            TablePanel.Controls.Add(BankLabel);  //< << <<< <<< ,<< ,<<<<< --------------------------------------------
+            //BankPicBox.BackgroundImage = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\bigBank.png"));
+            BankPicBox.Size = new Size((int)(PokerTableSize.Width * 0.30), (int)(PokerTableSize.Height * 0.17));
+            BankPicBox.Location = new Point((int)(PokerTableSize.Width * 0.35), (int)(PokerTableSize.Height * 0.52));
+            TablePanel.Controls.Add(BankPicBox);
+            TablePanel.BackgroundImage = Image.FromFile(String.Format(Directory.GetCurrentDirectory() + "\\..\\..\\Images\\TableT1.png"));
+            TablePanel.BackgroundImageLayout = ImageLayout.Stretch;
+            TablePanel.Dock = DockStyle.Fill;
             foreach (var seatNum in PlayerProfileLabels.Keys)
             {
                 TablePanel.Controls.Add(PlayerProfileLabels[seatNum]);
@@ -161,7 +203,7 @@ namespace Client
 
             TablePanel.Controls.Add(TableCardsTable);
 
-            TablePanel.Controls.Add(PBox);
+            //TablePanel.Controls.Add(PBox);
         }
 
         private void InitializeCreateTable()
@@ -178,6 +220,8 @@ namespace Client
             CreateGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 80)); // Main
             CreateGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 10)); // Right
 
+            CreateGameTable.BackColor = System.Drawing.Color.Transparent;
+
             CreateGameTable.Dock = DockStyle.Fill;
 
             CreateGameTable.Controls.Add(BackToMenuFromCreateGameButton, 0, 0);
@@ -193,11 +237,11 @@ namespace Client
             CreateGameTable.Controls.Add(new Panel(), 2, 2);
 
             CreateGameTable.Controls.Add(new Panel(), 0, 3);
-            CreateGameTable.Controls.Add(EnterMinFeeLabel, 1, 3);
+            CreateGameTable.Controls.Add(EnterGameIdLabel, 1, 3);
             CreateGameTable.Controls.Add(new Panel(), 2, 3);
 
             CreateGameTable.Controls.Add(new Panel(), 0, 4);
-            CreateGameTable.Controls.Add(MinFeeInput, 1, 4);
+            CreateGameTable.Controls.Add(GameIdInput, 1, 4);
             CreateGameTable.Controls.Add(new Panel(), 2, 4);
 
             CreateGameTable.Controls.Add(new Panel(), 0, 5);
@@ -220,6 +264,8 @@ namespace Client
             OptionsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Left Button "Back"
             OptionsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60)); // Main
             OptionsTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Right
+
+            OptionsTable.BackColor = System.Drawing.Color.Transparent;
 
             OptionsTable.Dock = DockStyle.Fill;
 
@@ -255,6 +301,8 @@ namespace Client
             ChooseGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Left Button "Back"
             ChooseGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60)); // Main
             ChooseGameTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Right Input Game Id + Join
+
+            ChooseGameTable.BackColor = System.Drawing.Color.Transparent;
 
             ChooseGameTable.Dock = DockStyle.Fill;
 
@@ -292,6 +340,8 @@ namespace Client
             MenuTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Left
             MenuTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60)); // Main
             MenuTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20)); // Right
+
+            MenuTable.BackColor = System.Drawing.Color.Transparent;
 
             MenuTable.Dock = DockStyle.Fill;
 

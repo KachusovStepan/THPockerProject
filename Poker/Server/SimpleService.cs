@@ -98,12 +98,13 @@ namespace Server
         public string CheckCards(int gameId, int playerId)
         {
             var games = Game.ShowGames();
-            if (!games.ContainsKey(gameId) || Game.GetGameInstance(gameId).PlayerByID.ContainsKey(playerId))
+            if (!games.ContainsKey(gameId) || (Game.GetGameInstance(gameId).PlayerByID != null && !Game.GetGameInstance(gameId).PlayerByID.ContainsKey(playerId)))
             {
                 return string.Empty;
             }
-
             var playerHand = Game.GetGameInstance(gameId).PlayerByID[playerId].Hand;
+            if (playerHand is null)
+                return string.Empty;
             var stringHand = string.Format("{0} {1}", playerHand.Item1.GetSimpleRepresentation(), playerHand.Item2.GetSimpleRepresentation());
             return stringHand;
         }
@@ -161,17 +162,55 @@ namespace Server
             {
                 return false;
             }
-
-            if (game.BetHasBeenMade)
+            if (bet == Bet.Bet)
             {
-                return false;
+                if (value < Game.MinBet)
+                    return false;
+                if (value + game.PlayerBySeat[playerInfo.Position].TableBet < game.roundMaxBet)
+                    return false;
+                if (value > playerInfo.ChipBank)
+                    return false;
             }
-
+            else if (bet == Bet.Call)
+            {
+                if (game.roundMaxBet == 0)
+                {
+                    Console.WriteLine("+++++++++++++()++++++++++++++++++++++()++++++++++++++++++()");
+                    return false;
+                }
+                var needToPay = game.roundMaxBet - game.PlayerBySeat[playerInfo.Position].TableBet;
+                if (needToPay > playerInfo.ChipBank)
+                {
+                    Console.WriteLine("+++++++++++++(-)++++++++++++++++++++++(-)++++++++++++++++++(-)");
+                    return false;
+                }
+            }
+            else if (bet == Bet.Check)
+            {
+                if (game.PlayerBySeat[playerInfo.Position].TableBet != game.roundMaxBet)
+                    return false;
+            }
+            else if (bet == Bet.Raise)
+            {
+                if (value + game.PlayerBySeat[playerInfo.Position].TableBet < game.roundMaxBet * 2 || game.roundMaxBet == 0)
+                    return false;
+            }
+            //if (game.BetHasBeenMade)
+            //{
+            //    return false;
+            //}
             var playerBet = new BetNode(playerId, playerInfo.Position, bet, value);
             game.RoundHistory.Add(playerBet);
             game.PlayerBets[playerInfo.Position] = playerBet;
+            game.DidPlayerMakeBet[playerInfo.Position] = true;
             game.BetHasBeenMade = true;
             return true;
+
+            //var playerBet = new BetNode(playerId, playerInfo.Position, bet, value);
+            //game.RoundHistory.Add(playerBet);
+            //game.PlayerBets[playerInfo.Position] = playerBet;
+            //game.BetHasBeenMade = true;
+            //return true;
         }
 
         public string CheckTableCards(int gameId)

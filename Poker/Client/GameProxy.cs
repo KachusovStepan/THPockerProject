@@ -48,6 +48,7 @@ namespace Client
             };
             CurrentState = null;
             MessagePointer = 0;
+            CurrentState = new State();
         }
 
         public bool GetExistingGamesWithPlayerCount() {
@@ -127,8 +128,15 @@ namespace Client
         public bool MakeCall()
         {
             if (CurrentState.CurrentPlayer != PlayerPosition)
+            {
+                Console.WriteLine("You are not Current");
                 return false;
+            }
             var successed = Proxy.DoCall(CurrentGameId, PlayerId);
+            if (!successed)
+            {
+                Console.WriteLine("Proxy denied");
+            }
             return successed;
         }
 
@@ -137,6 +145,10 @@ namespace Client
             if (CurrentState.CurrentPlayer != PlayerPosition)
                 return false;
             var successed = Proxy.DoCheck(CurrentGameId, PlayerId);
+            if (!successed)
+            {
+                Console.WriteLine("Proxy denied");
+            }
             return successed;
         }
 
@@ -145,6 +157,10 @@ namespace Client
             if (CurrentState.CurrentPlayer != PlayerPosition)
                 return false;
             var successed = Proxy.DoRaise(CurrentGameId, PlayerId, bet);
+            if (!successed)
+            {
+                Console.WriteLine("Proxy denied");
+            }
             return successed;
         }
 
@@ -153,6 +169,10 @@ namespace Client
             if (CurrentState.CurrentPlayer != PlayerPosition)
                 return false;
             var successed = Proxy.DoFold(CurrentGameId, PlayerId);
+            if (!successed)
+            {
+                Console.WriteLine("Proxy denied");
+            }
             return successed;
         }
 
